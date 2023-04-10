@@ -1,0 +1,14 @@
+{
+  "Logger": {
+    "Level": 1,
+    "Root": "logs",
+    "Type": "localFileLog"
+  },
+  "mysql": {
+    "Server": "192.168.1.2",
+    "Port": "3306",
+    "Database": "hm",
+    "Username": "root",
+    "Password": "1234qwer"
+  }
+}
