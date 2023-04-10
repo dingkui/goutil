@@ -2,11 +2,11 @@ package jsonutil
 
 import (
 	"bytes"
-	"codeup.aliyun.com/dk/go/goutil/utils/apputil"
-	"codeup.aliyun.com/dk/go/goutil/utils/fileutil"
-	"codeup.aliyun.com/dk/go/goutil/utils/zlog"
 	"encoding/json"
 	"errors"
+	"gitee.com/dk83_admin/goutil/utils/apputil"
+	"gitee.com/dk83_admin/goutil/utils/fileutil"
+	"gitee.com/dk83_admin/goutil/utils/zlog"
 	"io/ioutil"
 	"os"
 	"path/filepath"

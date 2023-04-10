@@ -2,9 +2,9 @@ package httputil
 
 import (
 	"bytes"
-	"codeup.aliyun.com/dk/go/goutil/utils/zlog"
 	"encoding/json"
 	"fmt"
+	"gitee.com/dk83_admin/goutil/utils/zlog"
 	"io"
 	"io/ioutil"
 	"net/http"

@@ -1,7 +1,7 @@
 package config
 
 import (
-	"codeup.aliyun.com/dk/go/goutil/utils/jsonutil"
+	"gitee.com/dk83_admin/goutil/utils/jsonutil"
 	"os"
 	"strings"
 )

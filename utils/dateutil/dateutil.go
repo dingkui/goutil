@@ -1,7 +1,7 @@
 package dateutil
 
 import (
-	"codeup.aliyun.com/dk/go/goutil/utils/zlog"
+	"gitee.com/dk83_admin/goutil/utils/zlog"
 	"os"
 	"time"
 )
