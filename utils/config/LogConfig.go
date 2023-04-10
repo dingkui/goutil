@@ -1,8 +1,8 @@
 package config
 
 import (
+	"codeup.aliyun.com/dk/go/goutil/utils/jsonutil"
 	"encoding/json"
-	"github.com/dingkui/goutil/utils/jsonutil"
 )
 
 type LogConfig struct {

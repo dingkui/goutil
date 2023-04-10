@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/dingkui/goutil/utils/jsonutil"
+	"codeup.aliyun.com/dk/go/goutil/utils/jsonutil"
 	"os"
 	"strings"
 )

@@ -1,9 +1,9 @@
 package fileutil
 
 import (
+	"codeup.aliyun.com/dk/go/goutil/utils/zlog"
 	"errors"
 	"fmt"
-	"github.com/dingkui/goutil/utils/zlog"
 	"io"
 	"os"
 	"path/filepath"

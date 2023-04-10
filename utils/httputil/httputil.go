@@ -2,9 +2,9 @@ package httputil
 
 import (
 	"bytes"
+	"codeup.aliyun.com/dk/go/goutil/utils/zlog"
 	"encoding/json"
 	"fmt"
-	"github.com/dingkui/goutil/utils/zlog"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -46,8 +46,6 @@ func Post(url string, param []byte, headers map[string]string, checkRes func(res
 		return nil, fmt.Errorf("网络故障-1"), true
 	}
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
-	req.Header.Add("cid", zlog.UserCache.Mac)
-	req.Header.Add("ver", zlog.VERSION)
 	if headers != nil && len(headers) > 0 {
 		for key, value := range headers {
 			req.Header.Add(key, value)
