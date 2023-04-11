@@ -2,7 +2,7 @@ package config
 
 import (
 	"encoding/json"
-	"gitee.com/dk83_admin/goutil/utils/jsonutil"
+	"gitee.com/dk83/goutils/jsonutil"
 )
 
 type LogConfig struct {

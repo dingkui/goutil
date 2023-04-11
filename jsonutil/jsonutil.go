@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"gitee.com/dk83_admin/goutil/utils/apputil"
-	"gitee.com/dk83_admin/goutil/utils/fileutil"
-	"gitee.com/dk83_admin/goutil/utils/zlog"
+	"gitee.com/dk83/goutils/apputil"
+	"gitee.com/dk83/goutils/fileutil"
+	"gitee.com/dk83/goutils/logutil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,7 +34,7 @@ func Readdata_json_file(file string) []byte {
 func Write_json_file(file string, data map[string]interface{}) {
 	b, e := json.Marshal(data)
 	if e != nil {
-		zlog.ErrorLn(e)
+		logutil.ErrorLn(e)
 		panic(e)
 		return
 	}
@@ -110,7 +110,7 @@ func GetItem(data interface{}, key ...interface{}) interface{} {
 	if ok {
 		_key, ok := key[0].(string)
 		if !ok {
-			zlog.Error("key type is error %T", key[0])
+			logutil.Error("key type is error %T", key[0])
 			return nil
 		}
 
@@ -125,12 +125,12 @@ func GetItem(data interface{}, key ...interface{}) interface{} {
 	if ok {
 		_key, ok := key[0].(int)
 		if !ok {
-			zlog.Error("key type is error %T", key[0])
+			logutil.Error("key type is error %T", key[0])
 			return nil
 		}
 
 		if _key >= len(_dataArray) {
-			zlog.Error("index out of range:[%d] with length %d", _key, len(_dataArray))
+			logutil.Error("index out of range:[%d] with length %d", _key, len(_dataArray))
 			return nil
 		}
 

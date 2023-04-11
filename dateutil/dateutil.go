@@ -1,7 +1,7 @@
 package dateutil
 
 import (
-	"gitee.com/dk83_admin/goutil/utils/zlog"
+	"gitee.com/dk83/goutils/logutil"
 	"os"
 	"time"
 )
@@ -15,7 +15,7 @@ func GetFileModTime(path string) (time.Time, bool) {
 	defer f.Close()
 	fi, err := f.Stat()
 	if err != nil {
-		zlog.Error("stat fileinfo error")
+		logutil.Error("stat fileinfo error")
 		return time.Now(), false
 	}
 	return fi.ModTime(), true

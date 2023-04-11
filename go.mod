@@ -1,3 +1,2 @@
-module gitee.com/dk83_admin/goutil
-
+module gitee.com/dk83/goutils
 go 1.17

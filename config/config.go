@@ -1,7 +1,7 @@
 package config
 
 import (
-	"gitee.com/dk83_admin/goutil/utils/jsonutil"
+	"gitee.com/dk83/goutils/jsonutil"
 	"os"
 	"strings"
 )

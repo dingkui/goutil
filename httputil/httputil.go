@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	"gitee.com/dk83_admin/goutil/utils/zlog"
+	"gitee.com/dk83/goutils/logutil"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -42,7 +42,7 @@ func Post(url string, param []byte, headers map[string]string, checkRes func(res
 	}
 	req, err := http.NewRequest("POST", url, body)
 	if err != nil {
-		zlog.Error("网络故障-1:url=%s,%s", url, err.Error())
+		logutil.Error("网络故障-1:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-1"), true
 	}
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
@@ -54,20 +54,20 @@ func Post(url string, param []byte, headers map[string]string, checkRes func(res
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		zlog.Error("网络故障-2:url=%s,%s", url, err.Error())
+		logutil.Error("网络故障-2:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-2"), true
 	}
 	defer resp.Body.Close()
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		zlog.Error("网络故障-3:url=%s,%s", url, err.Error())
+		logutil.Error("网络故障-3:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-3"), true
 	}
 
 	if checkRes != nil {
 		res, err, b := checkRes(resBody)
 		if !b {
-			zlog.Warn("网络故障-4:url=%s,%s", url, err.Error())
+			logutil.Warn("网络故障-4:url=%s,%s", url, err.Error())
 		}
 		return res, err, b
 	}
@@ -75,7 +75,7 @@ func Post(url string, param []byte, headers map[string]string, checkRes func(res
 	res := make(map[string]interface{})
 	err = json.Unmarshal(resBody, &res)
 	if err != nil {
-		zlog.Error("网络故障-4:url=%s,%s", url, err.Error())
+		logutil.Error("网络故障-4:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-4"), true
 	}
 	return res, err, true
@@ -122,7 +122,7 @@ func downloadImageOnce(dataFile, url string) (result bool) {
 
 	resp, err := http.DefaultClient.Get(url)
 	if err != nil {
-		zlog.ErrorLn(err)
+		logutil.ErrorLn(err)
 
 		return
 	}
@@ -134,7 +134,7 @@ func downloadImageOnce(dataFile, url string) (result bool) {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		zlog.ErrorLn(err, resp.StatusCode, url)
+		logutil.ErrorLn(err, resp.StatusCode, url)
 		return
 	}
 
@@ -143,18 +143,18 @@ func downloadImageOnce(dataFile, url string) (result bool) {
 
 	f, err := os.Create(dataFile)
 	if err != nil {
-		zlog.ErrorLn(err)
+		logutil.ErrorLn(err)
 		return
 	}
 	defer f.Close()
 	sz, err := io.Copy(f, resp.Body)
 	if err != nil {
-		zlog.ErrorLn(err)
+		logutil.ErrorLn(err)
 		return
 	}
 
 	if sz != int64(len) && len > 0 {
-		zlog.ErrorLn(sz, len)
+		logutil.ErrorLn(sz, len)
 		return
 	}
 
@@ -166,7 +166,7 @@ func downloadImageOnce(dataFile, url string) (result bool) {
 func MustDownload(fileUrl, dir string) (string, error) {
 	data, err := MustGet(fileUrl)
 	if err != nil {
-		zlog.ErrorLn(err, fileUrl)
+		logutil.ErrorLn(err, fileUrl)
 		return "", err
 	}
 	i, _ := url.Parse(fileUrl)
@@ -181,24 +181,24 @@ func MustGet(url string) ([]byte, error) {
 	for {
 		resp, err := http.DefaultClient.Get(url)
 		if err != nil {
-			zlog.ErrorLn(err, url)
+			logutil.ErrorLn(err, url)
 			continue
 		}
 		defer resp.Body.Close()
 
 		if resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusForbidden {
-			zlog.ErrorLn("404:", url)
+			logutil.ErrorLn("404:", url)
 			return nil, fmt.Errorf("404")
 		}
 
 		if resp.StatusCode != http.StatusOK {
-			zlog.ErrorLn(err, url)
+			logutil.ErrorLn(err, url)
 			continue
 		}
 
 		bytes, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			zlog.ErrorLn(err, url)
+			logutil.ErrorLn(err, url)
 			continue
 		}
 		return bytes, err
