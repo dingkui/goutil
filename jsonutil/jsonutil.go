@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"gitee.com/dk83/goutils/apputil"
 	"gitee.com/dk83/goutils/fileutil"
 	"gitee.com/dk83/goutils/logutil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
 )
 
 func Read_json_file(file string) map[string]interface{} {
@@ -31,6 +31,18 @@ func Readdata_json_file(file string) []byte {
 	return nil
 }
 
+func Write_formatjson_file(file string, data map[string]interface{}) {
+	b, e := json.Marshal(data)
+	if e != nil {
+		logutil.ErrorLn(e)
+		panic(e)
+		return
+	}
+
+	os.MkdirAll(filepath.Dir(file), os.ModePerm)
+	fileutil.WriteAndSyncFile(file, formatJson(b, true), os.ModePerm)
+	//ioutil.WriteFile(file,b,os.ModePerm)
+}
 func Write_json_file(file string, data map[string]interface{}) {
 	b, e := json.Marshal(data)
 	if e != nil {
@@ -68,7 +80,7 @@ func CopyMapVal(target map[string]interface{}, source map[string]interface{}, ke
 
 func Get_bytes(data map[string]interface{}) []byte {
 	b, e := json.Marshal(data)
-	if e != nil {
+	if e == nil {
 		return b
 	}
 	return nil
@@ -82,65 +94,147 @@ func Data2Json(data interface{}) string {
 	return ""
 }
 
-func GetItem(data interface{}, key ...interface{}) interface{} {
-	if len(key) == 0 || data == nil {
-		return data
-	}
-
-	_dataStr, ok := data.(string)
-	if ok {
-		if strings.Index(_dataStr, "{") == 0 {
-			rs := make(map[string]interface{})
-			err := json.Unmarshal([]byte(_dataStr), &rs)
-			if err != nil {
-				return nil
-			}
-			return GetItem(rs, key...)
-		} else if strings.Index(_dataStr, "[") == 0 {
-			var rs []interface{}
-			err := json.Unmarshal([]byte(_dataStr), &rs)
-			if err != nil {
-				return nil
-			}
-			return GetItem(rs, key...)
-		}
+//取得interface中的值，只支持map和数组
+func getItem(data interface{}, key interface{}) (interface{}, error) {
+	if data == nil {
+		return nil, errors.New("data is nil")
 	}
 
 	_dataMap, ok := data.(map[string]interface{})
 	if ok {
-		_key, ok := key[0].(string)
+		_key, ok := key.(string)
 		if !ok {
-			logutil.Error("key type is error %T", key[0])
-			return nil
+			return nil, errors.New(fmt.Sprintf("map key type is error %T", key))
 		}
-
-		_value, has := _dataMap[_key]
-		if has && len(key) > 1 {
-			return GetItem(_value, key[1:]...)
-		}
-		return _value
+		return _dataMap[_key], nil
 	}
-
 	_dataArray, ok := data.([]interface{})
 	if ok {
-		_key, ok := key[0].(int)
+		_key, ok := key.(int)
 		if !ok {
-			logutil.Error("key type is error %T", key[0])
-			return nil
+			return nil, errors.New(fmt.Sprintf("array key type is error %T", key))
 		}
-
 		if _key >= len(_dataArray) {
-			logutil.Error("index out of range:[%d] with length %d", _key, len(_dataArray))
-			return nil
+			return nil, errors.New(fmt.Sprintf("index out of range:[%d] with length %d", _key, len(_dataArray)))
 		}
+		return _dataArray[_key], nil
+	}
+	return nil, errors.New(fmt.Sprintf("setItem type is not sopport %T", data))
+}
 
-		_value := _dataArray[_key]
-		if len(key) > 1 {
-			return GetItem(_value, key[1:]...)
+//设置interface中的值，只支持map和数组
+func setItem(data interface{}, val interface{}, key interface{}) error {
+	if data == nil {
+		return errors.New("data is nil")
+	}
+	_dataMap, ok := data.(map[string]interface{})
+	if ok {
+		_key, ok := key.(string)
+		if !ok {
+			return errors.New(fmt.Sprintf("map key type is error %T", key))
 		}
-		return _value
+		_dataMap[_key] = val
+		return nil
+	}
+	_dataArray, ok := data.([]interface{})
+	if ok {
+		_key, ok := key.(int)
+		if !ok {
+			return errors.New(fmt.Sprintf("array key type is error %T", key))
+		}
+		if _key >= len(_dataArray) {
+			return errors.New(fmt.Sprintf("index out of range:[%d] with length %d", _key, len(_dataArray)))
+		}
+		_dataArray[_key] = val
+		return nil
+	}
+	return errors.New(fmt.Sprintf("setItem type is not sopport %T", data))
+}
+
+//设置interface中的值，只支持map和数组
+func checkKeys(keys ...interface{}) error {
+	for _, key := range keys {
+		_, isStr := key.(string)
+		_, isInt := key.(int)
+		if !isStr && !isInt {
+			return errors.New(fmt.Sprintf("key type is not sopport %T", key))
+		}
 	}
 	return nil
+}
+
+//设置interface中的值，支持多级设置，支持map,数组和json字符串
+func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{} {
+	err := checkKeys(keys...)
+	if err != nil {
+		logutil.ErrorLn(err)
+		return nil
+	}
+	var result interface{}
+	_dataStr, isString := data.(string)
+	if isString {
+		err := json.Unmarshal([]byte(_dataStr), &data)
+		if err != nil {
+			logutil.ErrorLn(err)
+			return nil
+		}
+	}
+	if len(keys) == 1 {
+		err := setItem(data, val, keys[0])
+		if err != nil {
+			logutil.ErrorLn(err)
+			return nil
+		}
+		result = data
+	} else if len(keys) > 1 {
+		item, err := getItem(data, keys[0])
+		if err != nil {
+			logutil.ErrorLn(err)
+			return nil
+		}
+		if item == nil {
+			_, ok := keys[1].(string)
+			if ok {
+				item = make(map[string]interface{})
+			} else {
+				len, ok := keys[1].(int)
+				if ok {
+					item = make([]interface{}, len+1)
+				}
+			}
+		}
+		result = SetItem(item, val, keys[1:]...)
+	}
+	if isString {
+		return Data2Json(result)
+	}
+	return result
+}
+
+//取得interface中的值，支持map，数组和json字符串
+func GetItem(data interface{}, keys ...interface{}) interface{} {
+	err := checkKeys(keys...)
+	if err != nil {
+		logutil.ErrorLn(err)
+		return nil
+	}
+	if len(keys) == 0 || data == nil {
+		return data
+	}
+	_dataStr, ok := data.(string)
+	if ok {
+		err := json.Unmarshal([]byte(_dataStr), &data)
+		if err != nil {
+			logutil.ErrorLn(err)
+			return nil
+		}
+	}
+	item, err := getItem(data, keys[0])
+	if err != nil {
+		logutil.ErrorLn(err)
+		return nil
+	}
+	return GetItem(item, keys[1:]...)
 }
 
 func GetArray(data interface{}, key ...interface{}) []interface{} {

@@ -1,18 +1,22 @@
 package config
 
 import (
+	"gitee.com/dk83/goutils/apputil"
 	"gitee.com/dk83/goutils/jsonutil"
 	"os"
 	"strings"
 )
 
 var (
-	confFile string = "config/conf.json"
+	confFile = apputil.GetPara("configFile", "config/conf.json")
 	conf     map[string]interface{}
 )
 
 func init() {
 	conf = jsonutil.Read_json_file(confFile)
+	if conf == nil {
+		conf = make(map[string]interface{})
+	}
 	for _, arg := range os.Args {
 		index := strings.Index(arg, "=")
 		if index > -1 {
@@ -21,6 +25,12 @@ func init() {
 			conf[arg] = "1"
 		}
 	}
+}
+func SetConf(key string, val interface{}) {
+	jsonutil.SetItem(conf, val, strings.Split(key, "."))
+}
+func SaveConf() {
+	jsonutil.Write_formatjson_file(confFile, conf)
 }
 func GetConfigMap(key string) map[string]interface{} {
 	item_map := jsonutil.GetMap(conf, key)

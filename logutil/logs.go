@@ -7,35 +7,61 @@ import (
 
 type LogInterface interface {
 	Log(level int, depthPre int, msg string)
+	LogAble(level int) bool
+	Init()
 }
 
 var (
-	Logger LogInterface
+	_log LogInterface
 )
 
 func Debug(message string, v ...interface{}) {
-	Logger.Log(0, 0, _msg(message, v...))
+	if !_log.LogAble(0) {
+		return
+	}
+	_log.Log(0, 0, _msg(message, v...))
 }
 func DebugLn(v ...interface{}) {
-	Logger.Log(0, 0, fmt.Sprintln(v...))
+	if !_log.LogAble(0) {
+		return
+	}
+	_log.Log(0, 0, fmt.Sprintln(v...))
 }
 func Info(message string, v ...interface{}) {
-	Logger.Log(1, 0, _msg(message, v...))
+	if !_log.LogAble(1) {
+		return
+	}
+	_log.Log(1, 0, _msg(message, v...))
 }
 func InfoLn(v ...interface{}) {
-	Logger.Log(1, 0, fmt.Sprintln(v...))
+	if !_log.LogAble(1) {
+		return
+	}
+	_log.Log(1, 0, fmt.Sprintln(v...))
 }
 func Warn(message string, v ...interface{}) {
-	Logger.Log(2, 0, _msg(message, v...))
+	if !_log.LogAble(2) {
+		return
+	}
+	_log.Log(2, 0, _msg(message, v...))
 }
 func WarnLn(v ...interface{}) {
-	Logger.Log(2, 0, fmt.Sprintln(v...))
+	if !_log.LogAble(2) {
+		return
+	}
+	_log.Log(2, 0, fmt.Sprintln(v...))
 }
 func Error(message string, v ...interface{}) {
-	Logger.Log(3, 0, _msg(message, v...))
+	if !_log.LogAble(3) {
+		return
+	}
+	_log.Log(3, 0, _msg(message, v...))
 }
 func ErrorLn(v ...interface{}) {
-	Logger.Log(3, 0, fmt.Sprintln(v...))
+	if !_log.LogAble(3) {
+		return
+	}
+	_log.Log(3, 0, fmt.Sprintln(v...))
 }
 func _msg(message string, v ...interface{}) string {
 	msg := message
@@ -52,4 +78,9 @@ func _msg(message string, v ...interface{}) string {
 		}
 	}
 	return msg
+}
+
+func InitLog(logger LogInterface) {
+	_log = logger
+	_log.Init()
 }
