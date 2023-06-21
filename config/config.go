@@ -27,7 +27,7 @@ func init() {
 	}
 }
 func SetConf(key string, val interface{}) {
-	jsonutil.SetItem(conf, val, strings.Split(key, "."))
+	jsonutil.SetItem(conf, val, getKeys(key)...)
 }
 func SaveConf() {
 	jsonutil.Write_formatjson_file(confFile, conf)
@@ -37,7 +37,15 @@ func GetConfigMap(key string) map[string]interface{} {
 	if item_map != nil {
 		return item_map
 	}
-	return jsonutil.GetMap(conf, strings.Split(key, "."))
+	return jsonutil.GetMap(conf, getKeys(key)...)
+}
+func getKeys(key string) []interface{} {
+	split := strings.Split(key, ".")
+	var keys []interface{}
+	for _, s := range split {
+		keys = append(keys, s)
+	}
+	return keys
 }
 
 func GetConfigString(key string) string {
@@ -45,7 +53,7 @@ func GetConfigString(key string) string {
 	if err != nil {
 		return str
 	}
-	str, err = jsonutil.GetString(conf, strings.Split(key, "."))
+	str, err = jsonutil.GetString(conf, getKeys(key)...)
 	return str
 }
 func GetConfigNum(key string) float64 {
@@ -53,7 +61,7 @@ func GetConfigNum(key string) float64 {
 	if err != nil {
 		return num
 	}
-	num, err = jsonutil.GetNum(conf, strings.Split(key, "."))
+	num, err = jsonutil.GetNum(conf, getKeys(key)...)
 	return num
 }
 func GetConfigBool(key string) bool {
@@ -61,6 +69,6 @@ func GetConfigBool(key string) bool {
 	if err != nil {
 		return num
 	}
-	num, err = jsonutil.GetBool(conf, strings.Split(key, "."))
+	num, err = jsonutil.GetBool(conf, getKeys(key)...)
 	return num
 }
