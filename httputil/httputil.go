@@ -68,10 +68,14 @@ func GET(url string, headers map[string]string, checkStatus func(string, int) er
 func POST(url string, param []byte, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
 	return doHttp("POST", url, nil, headers, checkStatus)
 }
-func PostAsByte(url string, param []byte, headers map[string]string) ([]byte, error) {
-	return POST(url, param, headers, nil)
+func POSTAsStr(url string, param []byte, headers map[string]string) (string, error) {
+	resBody, err := POST(url, param, headers, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(resBody), nil
 }
-func PostAsMap(url string, param []byte, headers map[string]string) (map[string]interface{}, error) {
+func POSTAsMap(url string, param []byte, headers map[string]string) (map[string]interface{}, error) {
 	resBody, err := POST(url, param, headers, nil)
 	if err != nil {
 		return nil, err
