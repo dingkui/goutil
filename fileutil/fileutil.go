@@ -71,7 +71,7 @@ func CopyFile(src, dest string) bool {
 	os.MkdirAll(filepath.Dir(dest), os.ModePerm)
 	f, err := os.Open(src)
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return false
 	}
 
@@ -79,7 +79,7 @@ func CopyFile(src, dest string) bool {
 
 	f2, err := os.Create(dest)
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return false
 	}
 	defer f2.Close()
@@ -96,19 +96,19 @@ func CopyFile(src, dest string) bool {
 func CopyDir(srcPath string, destPath string) error {
 	//检测目录正确性
 	if srcInfo, err := os.Stat(srcPath); err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return err
 	} else {
 		if !srcInfo.IsDir() {
 			e := errors.New("srcPath不是一个正确的目录！")
-			logutil.ErrorLn(e)
+			logutil.Error(e)
 			return e
 		}
 	}
 
 	err := os.MkdirAll(destPath, os.ModePerm)
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return err
 	}
 	//加上拷贝时间:不用可以去掉

@@ -34,7 +34,7 @@ func Readdata_json_file(file string) []byte {
 func Write_formatjson_file(file string, data map[string]interface{}) {
 	b, e := json.Marshal(data)
 	if e != nil {
-		logutil.ErrorLn(e)
+		logutil.Error(e)
 		panic(e)
 		return
 	}
@@ -46,7 +46,7 @@ func Write_formatjson_file(file string, data map[string]interface{}) {
 func Write_json_file(file string, data map[string]interface{}) {
 	b, e := json.Marshal(data)
 	if e != nil {
-		logutil.ErrorLn(e)
+		logutil.Error(e)
 		panic(e)
 		return
 	}
@@ -162,8 +162,14 @@ func setItem(data interface{}, val interface{}, key interface{}) error {
 //设置interface中的值，只支持map和数组
 func checkKeys(keys ...interface{}) error {
 	for _, key := range keys {
-		_, isStr := key.(string)
-		_, isInt := key.(int)
+		kStr, isStr := key.(string)
+		if isStr && kStr == "" {
+			return errors.New(fmt.Sprintf("key is string but emputy!"))
+		}
+		kInt, isInt := key.(int)
+		if isStr && kInt < 0 {
+			return errors.New(fmt.Sprintf("key is int but not effective!:%d", kInt))
+		}
 		if !isStr && !isInt {
 			return errors.New(fmt.Sprintf("key type is not sopport %T", key))
 		}
@@ -175,7 +181,7 @@ func checkKeys(keys ...interface{}) error {
 func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{} {
 	err := checkKeys(keys...)
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return nil
 	}
 	var result interface{}
@@ -183,21 +189,21 @@ func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{}
 	if isString {
 		err := json.Unmarshal([]byte(_dataStr), &data)
 		if err != nil {
-			logutil.ErrorLn(err)
+			logutil.Error(err)
 			return nil
 		}
 	}
 	if len(keys) == 1 {
 		err := setItem(data, val, keys[0])
 		if err != nil {
-			logutil.ErrorLn(err)
+			logutil.Error(err)
 			return nil
 		}
 		result = data
 	} else if len(keys) > 1 {
 		item, err := getItem(data, keys[0])
 		if err != nil {
-			logutil.ErrorLn(err)
+			logutil.Error(err)
 			return nil
 		}
 		if item == nil {
@@ -223,7 +229,7 @@ func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{}
 func GetItem(data interface{}, keys ...interface{}) interface{} {
 	err := checkKeys(keys...)
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return nil
 	}
 	if len(keys) == 0 || data == nil {
@@ -233,13 +239,13 @@ func GetItem(data interface{}, keys ...interface{}) interface{} {
 	if ok {
 		err := json.Unmarshal([]byte(_dataStr), &data)
 		if err != nil {
-			logutil.ErrorLn(err)
+			logutil.Error(err)
 			return nil
 		}
 	}
 	item, err := getItem(data, keys[0])
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error(err)
 		return nil
 	}
 	return GetItem(item, keys[1:]...)
