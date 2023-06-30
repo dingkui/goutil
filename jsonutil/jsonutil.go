@@ -93,6 +93,14 @@ func Data2Json(data interface{}) string {
 	}
 	return ""
 }
+func Json2Map(data string) map[string]interface{} {
+	rs := make(map[string]interface{})
+	err := json.Unmarshal([]byte(data), &rs)
+	if err != nil {
+		return nil
+	}
+	return rs
+}
 
 //取得interface中的值，只支持map和数组
 func getItem(data interface{}, key interface{}) (interface{}, error) {
