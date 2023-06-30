@@ -4,203 +4,149 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"gitee.com/dk83/goutils/fileutil"
 	"gitee.com/dk83/goutils/logutil"
 	"io"
 	"io/ioutil"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
-	"strconv"
 )
 
-type tsdbrelayHTTPTransport struct {
-	Transport http.RoundTripper
-}
-
-// RoundTrip sets a predefined agent in the request and then forwards it to the
-// default RountTrip implementation.
-func (this *tsdbrelayHTTPTransport) RoundTrip(r *http.Request) (*http.Response, error) {
-	r.Header.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36")
-	return this.Transport.RoundTrip(r)
-}
-
-func PostForNode(url string, param map[string]interface{}) (map[string]interface{}, error) {
-	b, err := json.Marshal(param)
-	if err != nil {
-		return nil, fmt.Errorf("参数格式化失败")
+func delfaultCheckSstatus(url string, status int) error {
+	if status == http.StatusNotFound || status == http.StatusForbidden {
+		logutil.Error("无效请求:url=%s,status：%d", url, status)
+		return fmt.Errorf("非法请求")
 	}
-	re, err, _ := Post(url, b, nil, nil)
-	return re, err
-}
 
-func Post(url string, param []byte, headers map[string]string, checkRes func(resBody []byte) (map[string]interface{}, error, bool)) (map[string]interface{}, error, bool) {
+	if status != http.StatusOK {
+		logutil.Error("服务器异常:url=%s,status：%d", url, status)
+		return fmt.Errorf("服务器异常")
+	}
+	return nil
+}
+func doHttp(method string, url string, bodys []byte, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
 	//把[]byte 转成实现了read接口的Reader结构体
 	var body io.Reader
-	if param != nil {
-		body = bytes.NewReader(param)
+	if bodys != nil {
+		body = bytes.NewReader(bodys)
 	}
-	req, err := http.NewRequest("POST", url, body)
+	req, err := http.NewRequest(method, url, body)
 	if err != nil {
 		logutil.Error("网络故障-1:url=%s,%s", url, err.Error())
-		return nil, fmt.Errorf("网络故障-1"), true
+		return nil, fmt.Errorf("网络故障-1")
 	}
-	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
 	if headers != nil && len(headers) > 0 {
 		for key, value := range headers {
 			req.Header.Add(key, value)
 		}
 	}
-
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logutil.Error("网络故障-2:url=%s,%s", url, err.Error())
-		return nil, fmt.Errorf("网络故障-2"), true
+		return nil, fmt.Errorf("网络故障-2")
 	}
 	defer resp.Body.Close()
+
+	if checkStatus == nil {
+		checkStatus = delfaultCheckSstatus
+	}
+	err = checkStatus(url, resp.StatusCode)
+	if err != nil {
+		return nil, err
+	}
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		logutil.Error("网络故障-3:url=%s,%s", url, err.Error())
-		return nil, fmt.Errorf("网络故障-3"), true
+		return nil, fmt.Errorf("网络故障-3")
 	}
-
-	if checkRes != nil {
-		res, err, b := checkRes(resBody)
-		if !b {
-			logutil.Warn("网络故障-4:url=%s,%s", url, err.Error())
-		}
-		return res, err, b
+	return resBody, err
+}
+func GET(url string, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
+	return doHttp("GET", url, nil, headers, checkStatus)
+}
+func POST(url string, param []byte, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
+	return doHttp("POST", url, nil, headers, checkStatus)
+}
+func PostAsByte(url string, param []byte, headers map[string]string) ([]byte, error) {
+	return POST(url, param, headers, nil)
+}
+func PostAsMap(url string, param []byte, headers map[string]string) (map[string]interface{}, error) {
+	resBody, err := POST(url, param, headers, nil)
+	if err != nil {
+		return nil, err
 	}
-
 	res := make(map[string]interface{})
 	err = json.Unmarshal(resBody, &res)
 	if err != nil {
 		logutil.Error("网络故障-4:url=%s,%s", url, err.Error())
-		return nil, fmt.Errorf("网络故障-4"), true
+		return nil, fmt.Errorf("网络故障-4")
 	}
-	return res, err, true
+	return res, nil
 }
-
-func Download2Dir(dir, urlPath string) (string, error) {
-	i, err := url.Parse(urlPath)
+func Get(url string) (string, error) {
+	resBody, err := GET(url, nil, nil)
 	if err != nil {
 		return "", err
 	}
-	dstfile := i.Path
-
-	dataFile := filepath.Join(dir, filepath.Base(dstfile))
-
-	tryNum := 0
-
-	for ; tryNum < 10; tryNum++ {
-		if downloadImageOnce(dataFile, urlPath) {
-			return dataFile, nil
-		}
-	}
-
-	return "", fmt.Errorf("下载失败")
+	return string(resBody), nil
 }
-
-func downloadImageOnce(dataFile, url string) (result bool) {
+func GetAsStr(url string) (string, error) {
+	resBody, err := GET(url, nil, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(resBody), nil
+}
+func GetAsByte(url string) ([]byte, error) {
+	return GET(url, nil, nil)
+}
+func GETAsStr(url string, headers map[string]string) (string, error) {
+	resBody, err := GET(url, headers, nil)
+	if err != nil {
+		return "", err
+	}
+	return string(resBody), nil
+}
+func GETAsMap(url string, headers map[string]string) (map[string]interface{}, error) {
+	resBody, err := GET(url, headers, nil)
+	if err != nil {
+		return nil, err
+	}
+	res := make(map[string]interface{})
+	err = json.Unmarshal(resBody, &res)
+	if err != nil {
+		logutil.Error("网络故障-4:url=%s,%s", url, err.Error())
+		return nil, fmt.Errorf("网络故障-4")
+	}
+	return res, nil
+}
+func Get2File(dataFile, url string) (result bool) {
 	result = false
-
-	rootDir := filepath.Dir(dataFile)
-	os.MkdirAll(rootDir, os.ModePerm)
-
+	err := os.MkdirAll(filepath.Dir(dataFile), os.ModePerm)
+	if err != nil {
+		logutil.Error("保存文件失败：", err.Error())
+		return
+	}
 	defer func() {
 		if !result {
 			os.Remove(dataFile)
 		}
-
 	}()
-	_, err := os.Stat(dataFile)
-	if err == nil {
-		//ctx.SendFile(imgFile,ctx.Params().Get("imgId"))
-		result = true
-		return
-	}
-
-	resp, err := http.DefaultClient.Get(url)
+	respBody, err := GET(url, nil, nil)
 	if err != nil {
-		logutil.ErrorLn(err)
-
 		return
 	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusForbidden {
-		result = true
-		return
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		logutil.ErrorLn(err, resp.StatusCode, url)
-		return
-	}
-
-	clen := resp.Header.Get("Content-Length")
-	len, _ := strconv.Atoi(clen)
-
-	f, err := os.Create(dataFile)
+	err = fileutil.WriteAndSyncFile(dataFile, respBody, os.ModePerm)
 	if err != nil {
-		logutil.ErrorLn(err)
+		logutil.Error("保存文件失败：%s dataFile=%s", err.Error(), dataFile)
 		return
 	}
-	defer f.Close()
-	sz, err := io.Copy(f, resp.Body)
-	if err != nil {
-		logutil.ErrorLn(err)
-		return
-	}
-
-	if sz != int64(len) && len > 0 {
-		logutil.ErrorLn(sz, len)
-		return
-	}
-
 	result = true
-
 	return
 }
-
-func MustDownload(fileUrl, dir string) (string, error) {
-	data, err := MustGet(fileUrl)
-	if err != nil {
-		logutil.ErrorLn(err, fileUrl)
-		return "", err
-	}
-	i, _ := url.Parse(fileUrl)
-	dstfile := i.Path
-	os.MkdirAll(filepath.Dir(dir+dstfile), os.ModePerm)
-	ioutil.WriteFile(dir+dstfile, data, os.ModePerm)
-
-	return dir + dstfile, nil
-}
-
-func MustGet(url string) ([]byte, error) {
-	for {
-		resp, err := http.DefaultClient.Get(url)
-		if err != nil {
-			logutil.ErrorLn(err, url)
-			continue
-		}
-		defer resp.Body.Close()
-
-		if resp.StatusCode == http.StatusNotFound || resp.StatusCode == http.StatusForbidden {
-			logutil.ErrorLn("404:", url)
-			return nil, fmt.Errorf("404")
-		}
-
-		if resp.StatusCode != http.StatusOK {
-			logutil.ErrorLn(err, url)
-			continue
-		}
-
-		bytes, err := ioutil.ReadAll(resp.Body)
-		if err != nil {
-			logutil.ErrorLn(err, url)
-			continue
-		}
-		return bytes, err
-	}
+func Get2Folder(folder, url string) (result bool) {
+	fileName := filepath.Base(url)
+	dataFile := filepath.Join(folder, fileName)
+	return Get2File(dataFile, url)
 }

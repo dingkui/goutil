@@ -1,5 +1,5 @@
 {
-  "Logger": {
+  "logger": {
     "Level": 1,
     "Root": "logs",
     "Type": "localFileLog"
