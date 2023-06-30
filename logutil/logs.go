@@ -2,6 +2,7 @@ package logutil
 
 import (
 	"fmt"
+	"gitee.com/dk83/goutils/stringutil"
 	"strings"
 )
 
@@ -31,7 +32,7 @@ func Log(level int, depthPre int, v ...interface{}) {
 	if !_log.LogAble(level) {
 		return
 	}
-	_log.Log(level, depthPre, Fmt(v...))
+	_log.Log(level, depthPre, stringutil.Fmt(v...))
 }
 func _msg(message string, v ...interface{}) string {
 	msg := message
@@ -46,19 +47,6 @@ func _msg(message string, v ...interface{}) string {
 			msg = fmt.Sprintln(msgs...)
 		} else {
 			msg = fmt.Sprintf(message, v...)
-		}
-	}
-	return msg
-}
-
-func Fmt(v ...interface{}) string {
-	msg := ""
-	if len(v) > 0 {
-		message, ok := v[0].(string)
-		if ok && strings.Index(message, "%") > -1 {
-			msg = fmt.Sprintf(message, v[1:]...)
-		} else {
-			msg = fmt.Sprintln(v...)
 		}
 	}
 	return msg

@@ -2,7 +2,6 @@ package httputil
 
 import (
 	"bytes"
-	"fmt"
 	"gitee.com/dk83/goutils/jsonutil"
 	"gitee.com/dk83/goutils/logutil"
 	"io"
@@ -12,21 +11,34 @@ import (
 	"strings"
 )
 
+func defCheckStatus(url string, status int) *HttpError {
+	if status == http.StatusNotFound || status == http.StatusForbidden {
+		logutil.Error("无效请求:url=%s,status：%d", url, status)
+		return Error(status, "非法请求")
+	}
+
+	if status != http.StatusOK {
+		logutil.Error("服务器异常:url=%s,status：%d", url, status)
+		return Error(status, "服务器异常")
+	}
+	return nil
+}
+
 type HTTP struct {
 	Method      string
 	Headers     map[string]string
-	CheckStatus func(string, int) error
-	PreReq      func(*http.Request) error
-	AfterRes    func(*http.Response) error
+	CheckStatus func(string, int) *HttpError
+	PreReq      func(*http.Request) *HttpError
+	AfterRes    func(*http.Response) *HttpError
 }
 type Para struct {
 	Url         string
 	UrlParas    jsonutil.JSON
 	Body        jsonutil.JSON
 	Headers     map[string]string
-	CheckStatus func(string, int) error
-	PreReq      func(*http.Request) error
-	AfterRes    func(*http.Response) error
+	CheckStatus func(string, int) *HttpError
+	PreReq      func(*http.Request) *HttpError
+	AfterRes    func(*http.Response) *HttpError
 }
 
 func (p *Para) IsBodyNil() bool {
@@ -35,21 +47,21 @@ func (p *Para) IsBodyNil() bool {
 func (p *Para) IsUrlPparsNil() bool {
 	return p == nil || p.UrlParas.IsNil()
 }
-func (h *HTTP) SendAsStr(para Para) (string, error) {
+func (h *HTTP) SendAsStr(para Para) (string, *HttpError) {
 	re, err := h.Send(para)
 	if err != nil {
 		return "", err
 	}
 	return string(re), nil
 }
-func (h *HTTP) SendAsJson(para Para) (*jsonutil.JSON, error) {
+func (h *HTTP) SendAsJson(para Para) (*jsonutil.JSON, *HttpError) {
 	re, err := h.Send(para)
 	if err != nil {
 		return nil, err
 	}
 	return jsonutil.MkJSON(re), nil
 }
-func (h *HTTP) Send(para Para) ([]byte, error) {
+func (h *HTTP) Send(para Para) ([]byte, *HttpError) {
 	//1.准备body
 	var body io.Reader
 	if !para.IsBodyNil() {
@@ -61,7 +73,7 @@ func (h *HTTP) Send(para Para) ([]byte, error) {
 		re, err := para.UrlParas.Map()
 		if err != nil {
 			logutil.Error("http请求参数错误:", err.Error())
-			return nil, fmt.Errorf("http请求参数错误")
+			return nil, Error(1, "http请求参数错误")
 		}
 		params := url.Values{}
 		for key, value := range re {
@@ -77,7 +89,7 @@ func (h *HTTP) Send(para Para) ([]byte, error) {
 	req, err := http.NewRequest(h.Method, _url, body)
 	if err != nil {
 		logutil.Error("网络故障-1:url=%s,%s", _url, err.Error())
-		return nil, fmt.Errorf("网络故障-1")
+		return nil, Error(1, "网络故障-1")
 	}
 
 	//4.请求前处理
@@ -97,9 +109,9 @@ func (h *HTTP) Send(para Para) ([]byte, error) {
 		preReq = h.PreReq
 	}
 	if preReq != nil {
-		err = preReq(req)
-		if err != nil {
-			return nil, err
+		httpError := preReq(req)
+		if httpError != nil {
+			return nil, httpError
 		}
 	}
 
@@ -107,7 +119,7 @@ func (h *HTTP) Send(para Para) ([]byte, error) {
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		logutil.Error("网络故障-2:url=%s,%s", _url, err.Error())
-		return nil, fmt.Errorf("网络故障-2")
+		return nil, Error(2, "网络故障-2")
 	}
 	defer resp.Body.Close()
 
@@ -117,20 +129,20 @@ func (h *HTTP) Send(para Para) ([]byte, error) {
 		checkStatus = h.CheckStatus
 	}
 	if checkStatus == nil {
-		checkStatus = delfaultCheckStatus
+		checkStatus = defCheckStatus
 	}
-	err = checkStatus(_url, resp.StatusCode)
+	httpError := checkStatus(_url, resp.StatusCode)
 	if err != nil {
-		return nil, err
+		return nil, httpError
 	}
 	afterRes := para.AfterRes
 	if afterRes == nil {
 		afterRes = h.AfterRes
 	}
 	if afterRes != nil {
-		err = afterRes(resp)
+		httpError = afterRes(resp)
 		if err != nil {
-			return nil, err
+			return nil, httpError
 		}
 	}
 
@@ -138,7 +150,7 @@ func (h *HTTP) Send(para Para) ([]byte, error) {
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		logutil.Error("网络故障-3:url=%s,%s", _url, err.Error())
-		return nil, fmt.Errorf("网络故障-3")
+		return nil, Error(3, "网络故障-3")
 	}
-	return resBody, err
+	return resBody, httpError
 }

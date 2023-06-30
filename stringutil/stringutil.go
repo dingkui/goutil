@@ -3,10 +3,24 @@ package stringutil
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strings"
 )
+
+func Fmt(v ...interface{}) string {
+	msg := ""
+	if len(v) > 0 {
+		message, ok := v[0].(string)
+		if ok && strings.Index(message, "%") > -1 {
+			msg = fmt.Sprintf(message, v[1:]...)
+		} else {
+			msg = fmt.Sprintln(v...)
+		}
+	}
+	return msg
+}
 
 //返回一个32位md5加密后的字符串
 func GetMD5Encode(data string) string {
