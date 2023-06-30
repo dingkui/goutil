@@ -2,9 +2,9 @@ package httputil
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"gitee.com/dk83/goutils/fileutil"
+	"gitee.com/dk83/goutils/jsonutil"
 	"gitee.com/dk83/goutils/logutil"
 	"io"
 	"io/ioutil"
@@ -13,7 +13,7 @@ import (
 	"path/filepath"
 )
 
-func delfaultCheckSstatus(url string, status int) error {
+func delfaultCheckStatus(url string, status int) error {
 	if status == http.StatusNotFound || status == http.StatusForbidden {
 		logutil.Error("无效请求:url=%s,status：%d", url, status)
 		return fmt.Errorf("非法请求")
@@ -25,7 +25,7 @@ func delfaultCheckSstatus(url string, status int) error {
 	}
 	return nil
 }
-func doHttp(method string, url string, bodys []byte, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
+func DoHttp(method string, url string, bodys []byte, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
 	//把[]byte 转成实现了read接口的Reader结构体
 	var body io.Reader
 	if bodys != nil {
@@ -49,7 +49,7 @@ func doHttp(method string, url string, bodys []byte, headers map[string]string, 
 	defer resp.Body.Close()
 
 	if checkStatus == nil {
-		checkStatus = delfaultCheckSstatus
+		checkStatus = delfaultCheckStatus
 	}
 	err = checkStatus(url, resp.StatusCode)
 	if err != nil {
@@ -63,68 +63,36 @@ func doHttp(method string, url string, bodys []byte, headers map[string]string, 
 	return resBody, err
 }
 func GET(url string, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
-	return doHttp("GET", url, nil, headers, checkStatus)
+	return DoHttp("GET", url, nil, headers, checkStatus)
 }
 func POST(url string, param []byte, headers map[string]string, checkStatus func(string, int) error) ([]byte, error) {
-	return doHttp("POST", url, nil, headers, checkStatus)
+	return DoHttp("POST", url, nil, headers, checkStatus)
 }
-func POSTAsStr(url string, param []byte, headers map[string]string) (string, error) {
-	resBody, err := POST(url, param, headers, nil)
-	if err != nil {
-		return "", err
-	}
-	return string(resBody), nil
-}
-func POSTAsMap(url string, param []byte, headers map[string]string) (map[string]interface{}, error) {
+func POSTAsJson(url string, param []byte, headers map[string]string) (*jsonutil.JSON, error) {
 	resBody, err := POST(url, param, headers, nil)
 	if err != nil {
 		return nil, err
 	}
-	res := make(map[string]interface{})
-	err = json.Unmarshal(resBody, &res)
-	if err != nil {
-		logutil.Error("网络故障-4:url=%s,%s", url, err.Error())
-		return nil, fmt.Errorf("网络故障-4")
-	}
-	return res, nil
+	return jsonutil.MkJSON(resBody), nil
 }
-func Get(url string) (string, error) {
-	resBody, err := GET(url, nil, nil)
-	if err != nil {
-		return "", err
-	}
-	return string(resBody), nil
-}
-func GetAsStr(url string) (string, error) {
-	resBody, err := GET(url, nil, nil)
-	if err != nil {
-		return "", err
-	}
-	return string(resBody), nil
-}
-func GetAsByte(url string) ([]byte, error) {
+func Get(url string) ([]byte, error) {
 	return GET(url, nil, nil)
 }
-func GETAsStr(url string, headers map[string]string) (string, error) {
-	resBody, err := GET(url, headers, nil)
+func GetAsJson(url string) (*jsonutil.JSON, error) {
+	resBody, err := GET(url, nil, nil)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return string(resBody), nil
+	return jsonutil.MkJSON(resBody), nil
 }
-func GETAsMap(url string, headers map[string]string) (map[string]interface{}, error) {
+func GETAsJson(url string, headers map[string]string) (*jsonutil.JSON, error) {
 	resBody, err := GET(url, headers, nil)
 	if err != nil {
 		return nil, err
 	}
-	res := make(map[string]interface{})
-	err = json.Unmarshal(resBody, &res)
-	if err != nil {
-		logutil.Error("网络故障-4:url=%s,%s", url, err.Error())
-		return nil, fmt.Errorf("网络故障-4")
-	}
-	return res, nil
+	return jsonutil.MkJSON(resBody), nil
 }
+
 func Get2File(dataFile, url string) (result bool) {
 	result = false
 	err := os.MkdirAll(filepath.Dir(dataFile), os.ModePerm)

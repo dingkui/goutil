@@ -11,6 +11,14 @@ type JSON struct {
 	_data []byte
 }
 
+func AsStr(data interface{}) string {
+	return MkJSON(data).Str()
+}
+
+//TODO
+//func AsInt(data interface{}) int {
+//	return MkJSON(data).b()
+//}
 func MkJSON(data interface{}) *JSON {
 	if data == nil {
 		return nil
@@ -39,9 +47,12 @@ func MkJSON(data interface{}) *JSON {
 	}
 	return nil
 }
+func (j *JSON) IsNil() bool {
+	return j == nil || j._data == nil
+}
 
 func (j *JSON) Array() (re []interface{}, err error) {
-	if j == nil || j._data == nil {
+	if j.IsNil() {
 		return nil, errors.New(fmt.Sprintf("JSON.Array fail:data is nil"))
 	}
 	err = json.Unmarshal(j._data, &re)
@@ -51,7 +62,7 @@ func (j *JSON) Array() (re []interface{}, err error) {
 	return re, nil
 }
 func (j *JSON) Map() (re map[string]interface{}, err error) {
-	if j == nil || j._data == nil {
+	if j.IsNil() {
 		return nil, errors.New(fmt.Sprintf("JSON.Map fail:data is nil"))
 	}
 	err = json.Unmarshal(j._data, &re)
@@ -61,7 +72,7 @@ func (j *JSON) Map() (re map[string]interface{}, err error) {
 	return re, nil
 }
 func (j *JSON) As(re interface{}) (err error) {
-	if j == nil || j._data == nil {
+	if j.IsNil() {
 		return errors.New(fmt.Sprintf("JSON.As fail:data is nil"))
 	}
 	err = json.Unmarshal(j._data, &re)
@@ -71,12 +82,15 @@ func (j *JSON) As(re interface{}) (err error) {
 	return nil
 }
 func (j *JSON) Str() string {
-	if j == nil || j._data == nil {
+	if j.IsNil() {
 		return ""
 	}
 	return string(j._data)
 }
 func (j *JSON) Bytes() []byte {
+	if j.IsNil() {
+		return nil
+	}
 	return j._data
 }
 
