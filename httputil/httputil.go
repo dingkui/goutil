@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"gitee.com/dk83/goutils/fileutil"
 	"gitee.com/dk83/goutils/jsonutil"
-	"gitee.com/dk83/goutils/logutil"
+	"gitee.com/dk83/goutils/zlog"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -15,12 +15,12 @@ import (
 
 func delfaultCheckStatus(url string, status int) error {
 	if status == http.StatusNotFound || status == http.StatusForbidden {
-		logutil.Error("无效请求:url=%s,status：%d", url, status)
+		zlog.Error("无效请求:url=%s,status：%d", url, status)
 		return fmt.Errorf("非法请求")
 	}
 
 	if status != http.StatusOK {
-		logutil.Error("服务器异常:url=%s,status：%d", url, status)
+		zlog.Error("服务器异常:url=%s,status：%d", url, status)
 		return fmt.Errorf("服务器异常")
 	}
 	return nil
@@ -33,7 +33,7 @@ func DoHttp(method string, url string, bodys []byte, headers map[string]string, 
 	}
 	req, err := http.NewRequest(method, url, body)
 	if err != nil {
-		logutil.Error("网络故障-1:url=%s,%s", url, err.Error())
+		zlog.Error("网络故障-1:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-1")
 	}
 	if headers != nil && len(headers) > 0 {
@@ -43,7 +43,7 @@ func DoHttp(method string, url string, bodys []byte, headers map[string]string, 
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logutil.Error("网络故障-2:url=%s,%s", url, err.Error())
+		zlog.Error("网络故障-2:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-2")
 	}
 	defer resp.Body.Close()
@@ -57,7 +57,7 @@ func DoHttp(method string, url string, bodys []byte, headers map[string]string, 
 	}
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logutil.Error("网络故障-3:url=%s,%s", url, err.Error())
+		zlog.Error("网络故障-3:url=%s,%s", url, err.Error())
 		return nil, fmt.Errorf("网络故障-3")
 	}
 	return resBody, err
@@ -97,7 +97,7 @@ func Get2File(dataFile, url string) (result bool) {
 	result = false
 	err := os.MkdirAll(filepath.Dir(dataFile), os.ModePerm)
 	if err != nil {
-		logutil.Error("保存文件失败：", err.Error())
+		zlog.Error("保存文件失败：", err.Error())
 		return
 	}
 	defer func() {
@@ -111,7 +111,7 @@ func Get2File(dataFile, url string) (result bool) {
 	}
 	err = fileutil.WriteAndSyncFile(dataFile, respBody, os.ModePerm)
 	if err != nil {
-		logutil.Error("保存文件失败：%s dataFile=%s", err.Error(), dataFile)
+		zlog.Error("保存文件失败：%s dataFile=%s", err.Error(), dataFile)
 		return
 	}
 	result = true

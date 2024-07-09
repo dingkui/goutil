@@ -3,11 +3,15 @@ package fileutil
 import (
 	"errors"
 	"fmt"
-	"gitee.com/dk83/goutils/logutil"
+	"gitee.com/dk83/goutils/zlog"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"syscall"
+	"time"
 )
 
 func WriteAndSyncFile(filename string, data []byte, perm os.FileMode) error {
@@ -71,7 +75,7 @@ func CopyFile(src, dest string) bool {
 	os.MkdirAll(filepath.Dir(dest), os.ModePerm)
 	f, err := os.Open(src)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return false
 	}
 
@@ -79,7 +83,7 @@ func CopyFile(src, dest string) bool {
 
 	f2, err := os.Create(dest)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return false
 	}
 	defer f2.Close()
@@ -96,19 +100,19 @@ func CopyFile(src, dest string) bool {
 func CopyDir(srcPath string, destPath string) error {
 	//检测目录正确性
 	if srcInfo, err := os.Stat(srcPath); err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return err
 	} else {
 		if !srcInfo.IsDir() {
 			e := errors.New("srcPath不是一个正确的目录！")
-			logutil.Error(e)
+			zlog.Error(e)
 			return e
 		}
 	}
 
 	err := os.MkdirAll(destPath, os.ModePerm)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return err
 	}
 	//加上拷贝时间:不用可以去掉
@@ -150,4 +154,24 @@ func RenameFile(oldFile, newFile string) error {
 		return err
 	}
 	return nil
+}
+
+func Read(path string) []byte {
+	by, e := ioutil.ReadFile(path)
+	if e != nil {
+		zlog.Error(e)
+	}
+	return by
+}
+
+func GetFileCreateTime(path string) int64 {
+	osType := runtime.GOOS
+	fileInfo, _ := os.Stat(path)
+	if osType == "windows" {
+		wFileSys := fileInfo.Sys().(*syscall.Win32FileAttributeData)
+		tNanSeconds := wFileSys.CreationTime.Nanoseconds() /// 返回的是纳秒
+		tSec := tNanSeconds / 1e9                          ///秒
+		return tSec
+	}
+	return time.Now().Unix()
 }

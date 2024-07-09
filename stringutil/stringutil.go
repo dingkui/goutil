@@ -9,17 +9,15 @@ import (
 	"strings"
 )
 
-func Fmt(v ...interface{}) string {
-	msg := ""
-	if len(v) > 0 {
-		message, ok := v[0].(string)
-		if ok && strings.Index(message, "%") > -1 {
-			msg = fmt.Sprintf(message, v[1:]...)
-		} else {
-			msg = fmt.Sprintln(v...)
-		}
+func Fmt(s interface{}, v ...interface{}) string {
+	if len(v) == 0 {
+		return fmt.Sprintln(s)
 	}
-	return msg
+	message, ok := s.(string)
+	if !ok || strings.Index(message, "%") == -1 {
+		return fmt.Sprintln(append([]interface{}{s}, v...)...)
+	}
+	return fmt.Sprintf(message, v...)
 }
 
 //返回一个32位md5加密后的字符串

@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"gitee.com/dk83/goutils/apputil"
 	"gitee.com/dk83/goutils/fileutil"
-	"gitee.com/dk83/goutils/logutil"
+	"gitee.com/dk83/goutils/zlog"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -34,7 +34,7 @@ func Readdata_json_file(file string) []byte {
 func Write_formatjson_file(file string, data map[string]interface{}) {
 	b, e := json.Marshal(data)
 	if e != nil {
-		logutil.Error(e)
+		zlog.Error(e)
 		panic(e)
 		return
 	}
@@ -46,7 +46,7 @@ func Write_formatjson_file(file string, data map[string]interface{}) {
 func Write_json_file(file string, data map[string]interface{}) {
 	b, e := json.Marshal(data)
 	if e != nil {
-		logutil.Error(e)
+		zlog.Error(e)
 		panic(e)
 		return
 	}
@@ -181,7 +181,7 @@ func checkKeys(keys ...interface{}) error {
 func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{} {
 	err := checkKeys(keys...)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return nil
 	}
 	var result interface{}
@@ -189,21 +189,21 @@ func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{}
 	if isString {
 		err := json.Unmarshal([]byte(_dataStr), &data)
 		if err != nil {
-			logutil.Error(err)
+			zlog.Error(err)
 			return nil
 		}
 	}
 	if len(keys) == 1 {
 		err := setItem(data, val, keys[0])
 		if err != nil {
-			logutil.Error(err)
+			zlog.Error(err)
 			return nil
 		}
 		result = data
 	} else if len(keys) > 1 {
 		item, err := getItem(data, keys[0])
 		if err != nil {
-			logutil.Error(err)
+			zlog.Error(err)
 			return nil
 		}
 		if item == nil {
@@ -229,7 +229,7 @@ func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{}
 func GetItem(data interface{}, keys ...interface{}) interface{} {
 	err := checkKeys(keys...)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return nil
 	}
 	if len(keys) == 0 || data == nil {
@@ -239,13 +239,13 @@ func GetItem(data interface{}, keys ...interface{}) interface{} {
 	if ok {
 		err := json.Unmarshal([]byte(_dataStr), &data)
 		if err != nil {
-			logutil.Error(err)
+			zlog.Error(err)
 			return nil
 		}
 	}
 	item, err := getItem(data, keys[0])
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return nil
 	}
 	return GetItem(item, keys[1:]...)

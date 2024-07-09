@@ -3,7 +3,7 @@ package httputil
 import (
 	"bytes"
 	"gitee.com/dk83/goutils/jsonutil"
-	"gitee.com/dk83/goutils/logutil"
+	"gitee.com/dk83/goutils/zlog"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -13,12 +13,12 @@ import (
 
 func defCheckStatus(url string, status int) *HttpError {
 	if status == http.StatusNotFound || status == http.StatusForbidden {
-		logutil.Error("无效请求:url=%s,status：%d", url, status)
+		zlog.Error("无效请求:url=%s,status：%d", url, status)
 		return Error(status, "非法请求")
 	}
 
 	if status != http.StatusOK {
-		logutil.Error("服务器异常:url=%s,status：%d", url, status)
+		zlog.Error("服务器异常:url=%s,status：%d", url, status)
 		return Error(status, "服务器异常")
 	}
 	return nil
@@ -72,7 +72,7 @@ func (h *HTTP) Send(para Para) ([]byte, *HttpError) {
 	if !para.IsUrlPparsNil() {
 		re, err := para.UrlParas.Map()
 		if err != nil {
-			logutil.Error("http请求参数错误:", err.Error())
+			zlog.Error("http请求参数错误:", err.Error())
 			return nil, Error(1, "http请求参数错误")
 		}
 		params := url.Values{}
@@ -88,7 +88,7 @@ func (h *HTTP) Send(para Para) ([]byte, *HttpError) {
 	//3.req生成
 	req, err := http.NewRequest(h.Method, _url, body)
 	if err != nil {
-		logutil.Error("网络故障-1:url=%s,%s", _url, err.Error())
+		zlog.Error("网络故障-1:url=%s,%s", _url, err.Error())
 		return nil, Error(1, "网络故障-1")
 	}
 
@@ -118,7 +118,7 @@ func (h *HTTP) Send(para Para) ([]byte, *HttpError) {
 	//5.执行网络请求
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		logutil.Error("网络故障-2:url=%s,%s", _url, err.Error())
+		zlog.Error("网络故障-2:url=%s,%s", _url, err.Error())
 		return nil, Error(2, "网络故障-2")
 	}
 	defer resp.Body.Close()
@@ -149,7 +149,7 @@ func (h *HTTP) Send(para Para) ([]byte, *HttpError) {
 	//8.读取返回信息
 	resBody, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		logutil.Error("网络故障-3:url=%s,%s", _url, err.Error())
+		zlog.Error("网络故障-3:url=%s,%s", _url, err.Error())
 		return nil, Error(3, "网络故障-3")
 	}
 	return resBody, httpError

@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"gitee.com/dk83/goutils/logutil"
+	"gitee.com/dk83/goutils/zlog"
 )
 
 type JSON struct {
@@ -97,7 +97,7 @@ func (j *JSON) Bytes() []byte {
 func (j *JSON) getItem(key interface{}) (interface{}, error) {
 	err := checkKeys(key)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return nil, err
 	}
 	_key, ok := key.(string)
@@ -132,7 +132,7 @@ func (j *JSON) GetJson(keys ...interface{}) *JSON {
 func (j *JSON) GetItem(keys ...interface{}) interface{} {
 	err := checkKeys(keys...)
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return nil
 	}
 	if len(keys) == 0 {
@@ -140,7 +140,7 @@ func (j *JSON) GetItem(keys ...interface{}) interface{} {
 	}
 	item, err := j.getItem(keys[0])
 	if err != nil {
-		logutil.Error(err)
+		zlog.Error(err)
 		return nil
 	}
 	if len(keys) == 1 {
