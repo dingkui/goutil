@@ -6,41 +6,41 @@ import (
 	"testing"
 )
 
-type typeTest1 struct {
+type TypeTest1 struct {
 	name string
 }
-type typeTest1Child struct {
-	typeTest1
+type TypeTest1Child struct {
+	TypeTest1
 }
 
 func TestTypeTest1_1(t *testing.T) {
-	child := &typeTest1Child{}
+	child := &TypeTest1Child{}
 	child.name = "t2"
-	parent := child.typeTest1 // 正确地进行类型断言
+	parent := child.TypeTest1 // 正确地进行类型断言
 	parent.name = "t1"
-	fmt.Printf("parent:%+v t2:%+v", parent, child) // 注意换行符的位置
+	fmt.Printf("parent:%+v t2:%+v", parent, child)
 }
 func TestTypeTest1_2(t *testing.T) {
-	child := &typeTest1Child{}
+	child := &TypeTest1Child{}
 	child.name = "t2"
-	parent := &child.typeTest1 // 正确地进行类型断言
+	parent := &child.TypeTest1 // 正确地进行类型断言
 	parent.name = "t1"
-	fmt.Printf("parent:%+v t2:%+v", parent, child) // 注意换行符的位置
+	fmt.Printf("parent:%+v t2:%+v", parent, child)
 }
 func checkType(t interface{}) {
-	value, ok := t.(typeTest1Child)
+	value, ok := t.(TypeTest1Child)
 	if ok {
-		fmt.Println("t is of type typeTest1Child:", value)
+		fmt.Println("t is of type TypeTest1Child:", value)
 	} else {
-		fmt.Println("t is not of type typeTest1Child:")
+		fmt.Println("t is not of type TypeTest1Child:")
 	}
-	value2, ok := t.(typeTest1)
+	value2, ok := t.(TypeTest1)
 	if ok {
-		fmt.Println("t is of type typeTest1:", value2)
+		fmt.Println("t is of type TypeTest1:", value2)
 	} else {
-		fmt.Println("t is not of type typeTest1:")
+		fmt.Println("t is not of type TypeTest1:")
 	}
-	var d typeTest1Child
+	var d TypeTest1Child
 	var b interface{} = d
 	fmt.Printf("t type is:%s", reflect.TypeOf(t).String())
 	if reflect.TypeOf(b).String() == "main.Base" {
@@ -49,40 +49,40 @@ func checkType(t interface{}) {
 		fmt.Println("b is not of type Base")
 	}
 
-	if _, ok := b.(typeTest1); ok {
-		fmt.Println("b is of type typeTest1")
+	if _, ok := b.(TypeTest1); ok {
+		fmt.Println("b is of type TypeTest1")
 	} else {
-		fmt.Println("b is not of type typeTest1")
+		fmt.Println("b is not of type TypeTest1")
 	}
 }
 func checkType2(t interface{}) {
 	switch t.(type) {
-	case typeTest1:
-		fmt.Println("checkType2 typeTest1")
-	case typeTest1Child:
-		fmt.Println("checkType2 typeTest1Child")
+	case TypeTest1:
+		fmt.Println("checkType2 TypeTest1")
+	case TypeTest1Child:
+		fmt.Println("checkType2 TypeTest1Child")
 	}
 }
 func checkType3(t interface{}) {
 	switch t.(type) {
-	case *typeTest1:
-		fmt.Println("checkType3 指针: typeTest1")
-	case typeTest1:
-		fmt.Println("checkType3 类型: typeTest1")
-	case *typeTest1Child:
-		fmt.Println("checkType3 指针: typeTest1Child")
-	case typeTest1Child:
-		fmt.Println("checkType3 类型: typeTest1Child")
+	case *TypeTest1:
+		fmt.Println("checkType3 指针: TypeTest1")
+	case TypeTest1:
+		fmt.Println("checkType3 类型: TypeTest1")
+	case *TypeTest1Child:
+		fmt.Println("checkType3 指针: TypeTest1Child")
+	case TypeTest1Child:
+		fmt.Println("checkType3 类型: TypeTest1Child")
 	}
 }
 func TestCheckType(t *testing.T) {
-	child := typeTest1Child{}
+	child := TypeTest1Child{}
 	child.name = "t2"
-	checkType(child) // 注意换行符的位置
+	checkType(child)
 }
 func TestCheckType2(t *testing.T) {
-	child := &typeTest1Child{}
+	child := &TypeTest1Child{}
 	child.name = "t2"
-	checkType3(child)            // 注意换行符的位置
-	checkType3(&child.typeTest1) // 注意换行符的位置
+	checkType3(child)
+	checkType3(&child.TypeTest1)
 }

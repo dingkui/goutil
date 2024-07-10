@@ -59,7 +59,7 @@ func (h *HTTP) SendAsJson(para Para) (*jsonutil.JSON, *HttpError) {
 	if err != nil {
 		return nil, err
 	}
-	return jsonutil.MkJSON(re), nil
+	return jsonutil.NewJSON(re), nil
 }
 func (h *HTTP) Send(para Para) ([]byte, *HttpError) {
 	//1.准备body

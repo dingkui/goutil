@@ -73,7 +73,7 @@ func POSTAsJson(url string, param []byte, headers map[string]string) (*jsonutil.
 	if err != nil {
 		return nil, err
 	}
-	return jsonutil.MkJSON(resBody), nil
+	return jsonutil.NewJSON(resBody), nil
 }
 func Get(url string) ([]byte, error) {
 	return GET(url, nil, nil)
@@ -83,14 +83,14 @@ func GetAsJson(url string) (*jsonutil.JSON, error) {
 	if err != nil {
 		return nil, err
 	}
-	return jsonutil.MkJSON(resBody), nil
+	return jsonutil.NewJSON(resBody), nil
 }
 func GETAsJson(url string, headers map[string]string) (*jsonutil.JSON, error) {
 	resBody, err := GET(url, headers, nil)
 	if err != nil {
 		return nil, err
 	}
-	return jsonutil.MkJSON(resBody), nil
+	return jsonutil.NewJSON(resBody), nil
 }
 
 func Get2File(dataFile, url string) (result bool) {

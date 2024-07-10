@@ -93,8 +93,7 @@ func Data2Json(data interface{}) string {
 	}
 	return ""
 }
-func Json2Map(data string) map[string]interface{} {
-	rs := make(map[string]interface{})
+func Json2Map(data string) (rs map[string]interface{}) {
 	err := json.Unmarshal([]byte(data), &rs)
 	if err != nil {
 		return nil

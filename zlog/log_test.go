@@ -14,18 +14,18 @@ var (
 )
 
 func TestGetCaller(t *testing.T) {
-	fmt.Println(getCaller(0)) // 注意换行符的位置
-	fmt.Println(getCaller(1)) // 注意换行符的位置
-	fmt.Println(getCaller(2)) // 注意换行符的位置
+	fmt.Println(getCaller(0))
+	fmt.Println(getCaller(1))
+	fmt.Println(getCaller(2))
 }
 func TestLog(t *testing.T) {
-	Debug("113: %s", "Debug") // 注意换行符的位置
-	Info("113: %s", "Info")   // 注意换行符的位置
-	Warn("113: %s", "Warn")   // 注意换行符的位置
-	Error("113: %s", "Error") // 注意换行符的位置
+	Debug("113: %s", "Debug")
+	Info("113: %s", "Info")
+	Warn("113: %s", "Warn")
+	Error("113: %s", "Error")
 }
 func TestTrace(t *testing.T) {
-	testTrace() // 注意换行符的位置
+	testTrace()
 }
 func testTrace() {
 	//ErrorStack("ErrorStack:","short")

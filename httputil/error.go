@@ -5,10 +5,10 @@ import (
 	"gitee.com/dk83/goutils/stringutil"
 )
 
-func Error(code int, a ...interface{}) *HttpError {
+func Error(code int, msg interface{}, a ...interface{}) *HttpError {
 	return &HttpError{
 		code: code,
-		err:  errors.New(stringutil.Fmt(a...)),
+		err:  errors.New(stringutil.Fmt(msg, a...)),
 	}
 }
 
