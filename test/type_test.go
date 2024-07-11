@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"gitee.com/dk83/goutils/zlog"
 	"reflect"
 	"testing"
 )
@@ -85,4 +86,10 @@ func TestCheckType2(t *testing.T) {
 	child.name = "t2"
 	checkType3(child)
 	checkType3(&child.TypeTest1)
+}
+
+func TestArray(t *testing.T) {
+	s := []int{1}
+	ints := s[:0]
+	zlog.Info(ints)
 }

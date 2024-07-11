@@ -73,7 +73,7 @@ func getStack(stackInfo string, start int, calldepth int, isShort bool) string {
 			index = strings.Index(s, ".go")
 			simpleLen := len(shortInfo)
 			if index > -1 && simpleLen > 0 {
-				shortInfo[simpleLen-1] += " " + stacks[i]
+				shortInfo[simpleLen-1] = "  -> " + shortInfo[simpleLen-1] + " " + stacks[i]
 			} else {
 				shortInfo = append(shortInfo, stacks[i])
 			}

@@ -2,7 +2,6 @@ package jsonutil
 
 import (
 	"encoding/json"
-	"errors"
 	"gitee.com/dk83/goutils/zlog"
 	"reflect"
 	"strings"
@@ -32,34 +31,38 @@ func (j *JsonGo) mapData() (map[string]*JsonGo, error) {
 			return m, nil
 		}
 	}
-	return nil, errors.New("target is not a Map")
+	return nil, errJsonType.New("target is not a Map")
 }
-func (j *JsonGo) arrayData() ([]*JsonGo, error) {
+func (j *JsonGo) arrayData() (*[]*JsonGo, error) {
 	if j._type == jsonArray {
 		m, ok := j.v.([]*JsonGo)
 		if ok {
-			return m, nil
+			return &m, nil
 		}
 	}
-	return nil, errors.New("target is not a Array")
+	return nil, errJsonType.New("target is not a Array")
 }
-
+func (j *JsonGo) from(f *JsonGo) {
+	j.v = f.v
+	j._type = f._type
+}
 func mkJsonGoByBytes(bytes []byte, re *JsonGo) error {
 	if bytes == nil {
-		return errors.New("input is nil when mkJsonGoByBytes")
+		return errValid.New("input is nil when mkJsonGoByBytes")
 	}
 	//defer re.covert()
-	if regJsonMap.Match(bytes) {
-		err := json.Unmarshal(bytes, &re.v)
-		if err == nil {
+	err := json.Unmarshal(bytes, &re.v)
+	if err == nil {
+		_map, ok := re.v.(map[string]interface{})
+		if ok {
+			re.v = _map
 			re._type = jsonMap
 			return nil
 		}
-	}
-	if regJsonArray.Match(bytes) {
-		err := json.Unmarshal(bytes, &re.v)
-		if err == nil {
-			re._type = jsonMap
+		_array, ok := re.v.([]interface{})
+		if ok {
+			re.v = _array
+			re._type = jsonArray
 			return nil
 		}
 	}
@@ -73,7 +76,7 @@ func (j *JsonGo) covert() {
 	if j._type == jsonMap {
 		mapData, ok := j.v.(map[string]interface{})
 		if !ok {
-			zlog.Error("covert jsonMap error!")
+			zlog.ErrorStackShrot("covert jsonMap error! %T", j.v)
 			return
 		}
 		v := make(map[string]*JsonGo)
@@ -88,7 +91,7 @@ func (j *JsonGo) covert() {
 			zlog.Error("covert jsonArray error!")
 			return
 		}
-		var v []*JsonGo
+		v := make([]*JsonGo, 0)
 		for _, value := range arrayData {
 			v = append(v, NewJsonGo(value))
 		}

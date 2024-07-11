@@ -2,23 +2,54 @@ package jsonutil
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"gitee.com/dk83/goutils/zlog"
 )
 
-func (j *JsonGo) Native() (interface{}, error) {
-	if j._type == jsonMap {
-		return j.mapNative()
+// Native 获取原生数据
+func (j *JsonGo) Native(keys ...interface{}) (interface{}, error) {
+	t, err := j.Get(keys...)
+	if err != nil {
+		return nil, err
 	}
-	if j._type == jsonArray {
-		return j.arrayNative()
+
+	if t._type == jsonMap {
+		return t.NativeMap()
 	}
-	return j.v, nil
+	if t._type == jsonArray {
+		return t.NativeArray()
+	}
+	return t.v, nil
 }
 
-func (j *JsonGo) mapNative() (map[string]interface{}, error) {
-	data, err := j.mapData()
+func (j *JsonGo) NativeArray(keys ...interface{}) ([]interface{}, error) {
+	t, err := j.Get(keys...)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := t.arrayData()
+	if err != nil {
+		return nil, err
+	}
+
+	var _re []interface{}
+
+	for _, value := range *data {
+		_value, err := value.Native()
+		if err != nil {
+			return nil, err
+		}
+		_re = append(_re, _value)
+	}
+	return _re, nil
+}
+func (j *JsonGo) NativeMap(keys ...interface{}) (map[string]interface{}, error) {
+	t, err := j.Get(keys...)
+	if err != nil {
+		return nil, err
+	}
+
+	data, err := t.mapData()
 	if err != nil {
 		return nil, err
 	}
@@ -33,97 +64,63 @@ func (j *JsonGo) mapNative() (map[string]interface{}, error) {
 	}
 	return _re, nil
 }
-func (j *JsonGo) arrayNative() ([]interface{}, error) {
-	data, err := j.arrayData()
-	if err != nil {
-		return nil, err
-	}
 
-	_re := []interface{}{}
-	for _, value := range data {
-		_value, err := value.Native()
-		if err != nil {
-			return nil, err
-		}
-		_re = append(_re, _value)
-	}
-	return _re, nil
-}
-
-func (j *JsonGo) Byte() ([]byte, error) {
-	native, err := j.Native()
+func (j *JsonGo) Byte(keys ...interface{}) ([]byte, error) {
+	native, err := j.Native(keys...)
 	if err != nil {
 		return nil, err
 	}
 	return json.Marshal(native)
 }
 
-func (j *JsonGo) Str() string {
-	if j._type == jsonString {
-		return j.v.(string)
+func (j *JsonGo) Str(keys ...interface{}) string {
+	t, err := j.Get(keys...)
+	if err != nil {
+		zlog.Warn(err)
+		return ""
 	}
-	bytes, err := j.Byte()
+
+	if t._type == jsonString {
+		return t.v.(string)
+	}
+	bytes, err := t.Byte()
 	if err != nil {
 		zlog.Error(err)
 		return ""
 	}
 	return string(bytes)
 }
-func (j *JsonGo) ValueArray() []interface{} {
-	native, err := j.arrayNative()
-	if err != nil {
-		zlog.Error(err)
-		return nil
-	}
-	return native
-}
-func (j *JsonGo) ValueMap() map[string]interface{} {
-	native, err := j.mapNative()
-	if err != nil {
-		zlog.Error(err)
-		return nil
-	}
-	return native
-}
-func (j *JsonGo) ValueStr() string {
-	native, err := j.Native()
-	if err != nil {
-		zlog.Error(err)
-		return ""
-	}
-	return native.(string)
-}
-func (j *JsonGo) ValueFloat64() (float64, error) {
-	native, err := j.Native()
+func (j *JsonGo) Float(keys ...interface{}) (float64, error) {
+	native, err := j.Native(keys...)
 	if err != nil {
 		return 0, err
 	}
 	f, ok := native.(float64)
 	if !ok {
-		return 0, errors.New("value is not float64")
+		return 0, errTargetType.New("value is not float64")
 	}
 	return f, nil
 }
-func (j *JsonGo) ValueBool() (bool, error) {
-	native, err := j.Native()
+func (j *JsonGo) Bool(keys ...interface{}) (bool, error) {
+	native, err := j.Native(keys...)
 	if err != nil {
 		return false, err
 	}
 	f, ok := native.(bool)
 	if !ok {
-		return false, errors.New("value is not bool")
+		return false, errTargetType.New("value is not bool")
 	}
 	return f, nil
 }
 
-func (j *JsonGo) As(re interface{}) (err error) {
-	bytes, err := j.Byte()
+func (j *JsonGo) As(re interface{}, keys ...interface{}) (err error) {
+	bytes, err := j.Byte(keys...)
 	if err != nil {
 		return err
 	}
 	err = json.Unmarshal(bytes, &re)
 	if err != nil {
-		return errors.New(fmt.Sprintf("JSON.As fail:can't as [%T] from:%s,err:%s", re, string(bytes), err.Error()))
+		return errTargetType.New("JSON.As fail:can't as [%T] from:%s,err:%s", re, string(bytes), err.Error())
 	}
 	return nil
 }

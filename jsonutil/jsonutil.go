@@ -163,14 +163,14 @@ func checkKeys(keys ...interface{}) error {
 	for _, key := range keys {
 		kStr, isStr := key.(string)
 		if isStr && kStr == "" {
-			return errors.New(fmt.Sprintf("key is string but emputy!"))
+			return errValid.New("key is string but emputy!")
 		}
 		kInt, isInt := key.(int)
-		if isStr && kInt < 0 {
-			return errors.New(fmt.Sprintf("key is int but not effective!:%d", kInt))
+		if isStr && kInt < -1 {
+			return errValid.New("key is int but not effective!:%d", kInt)
 		}
 		if !isStr && !isInt {
-			return errors.New(fmt.Sprintf("key type is not sopport %T", key))
+			return errValid.New("key type is not sopport %T", key)
 		}
 	}
 	return nil

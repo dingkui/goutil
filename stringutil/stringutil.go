@@ -11,11 +11,11 @@ import (
 
 func Fmt(s interface{}, v ...interface{}) string {
 	if len(v) == 0 {
-		return fmt.Sprintln(s)
+		return fmt.Sprint(s)
 	}
 	message, ok := s.(string)
 	if !ok || strings.Index(message, "%") == -1 {
-		return fmt.Sprintln(append([]interface{}{s}, v...)...)
+		return fmt.Sprint(append([]interface{}{s}, v...)...)
 	}
 	return fmt.Sprintf(message, v...)
 }
