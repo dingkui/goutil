@@ -9,19 +9,26 @@ import (
 )
 
 type JSONFile struct {
-	JSONObject
+	JsonGo
 	_file string
 }
 
+func (j *JSONFile) NewFile(file string) {
+	newJSON := NewJsonGo(make(map[string]interface{}))
+	if newJSON != nil {
+		j.JsonGo = *newJSON
+		j._file = file
+	}
+}
 func (j *JSONFile) Read(file string) {
 	b, e := ioutil.ReadFile(file)
 	if e != nil {
 		zlog.Error("read file error:", e)
 		return
 	}
-	newJSON := NewJSON(b)
+	newJSON := NewJsonGo(b)
 	if newJSON != nil {
-		j.JSONObject = *newJSON
+		j.JsonGo = *newJSON
 		j._file = file
 	}
 }

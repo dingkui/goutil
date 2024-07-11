@@ -24,3 +24,6 @@ func getkeys(key string) []interface{} {
 	}
 	return keys
 }
+func getInt(str string) (int, error) {
+	return strconv.Atoi(str)
+}
