@@ -1,9 +1,6 @@
 package jsonutil
 
-import (
-	"encoding/json"
-	"gitee.com/dk83/goutils/zlog"
-)
+import "gitee.com/dk83/goutils/zlog"
 
 // Native 获取原生数据
 func (j *JsonGo) Native(keys ...interface{}) (interface{}, error) {
@@ -32,7 +29,7 @@ func (j *JsonGo) NativeArray(keys ...interface{}) ([]interface{}, error) {
 		return nil, err
 	}
 
-	var _re []interface{}
+	_re := make([]interface{}, 0)
 
 	for _, value := range *data {
 		_value, err := value.Native()
@@ -70,57 +67,71 @@ func (j *JsonGo) Byte(keys ...interface{}) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(native)
+	return Byte(native)
 }
 
-func (j *JsonGo) Str(keys ...interface{}) string {
+func (j *JsonGo) Str(def string, keys ...interface{}) (string, error) {
 	t, err := j.Get(keys...)
 	if err != nil {
-		zlog.Warn(err)
-		return ""
+		return def, err
 	}
-
-	if t._type == jsonString {
-		return t.v.(string)
-	}
-	bytes, err := t.Byte()
+	native, err := t.Native()
 	if err != nil {
-		zlog.Error(err)
-		return ""
+		return def, err
 	}
-	return string(bytes)
+	return Str(def, native)
 }
-func (j *JsonGo) Float(keys ...interface{}) (float64, error) {
+func (j *JsonGo) StrN(def string, keys ...interface{}) string {
+	t, err := j.Str(def, keys...)
+	if err != nil {
+		zlog.Warn(err)
+	}
+	return t
+}
+func (j *JsonGo) Int(def int, keys ...interface{}) (int, error) {
+	t, err := j.Get(keys...)
+	if err != nil {
+		return def, err
+	}
+	native, err := t.Native()
+	if err != nil {
+		return def, err
+	}
+	return Int(def, native)
+}
+func (j *JsonGo) IntN(def int, keys ...interface{}) int {
+	t, err := j.Int(def, keys...)
+	if err != nil {
+		zlog.Warn(err)
+	}
+	return t
+}
+func (j *JsonGo) Float(def float64, keys ...interface{}) (float64, error) {
 	native, err := j.Native(keys...)
 	if err != nil {
-		return 0, err
+		return def, err
 	}
-	f, ok := native.(float64)
-	if !ok {
-		return 0, errTargetType.New("value is not float64")
-	}
-	return f, nil
+	return Float(def, native)
 }
-func (j *JsonGo) Bool(keys ...interface{}) (bool, error) {
+func (j *JsonGo) FloatN(def float64, keys ...interface{}) float64 {
+	t, err := j.Float(def, keys...)
+	if err != nil {
+		zlog.Warn(err)
+	}
+	return t
+}
+func (j *JsonGo) Bool(def bool, keys ...interface{}) (bool, error) {
 	native, err := j.Native(keys...)
 	if err != nil {
 		return false, err
 	}
-	f, ok := native.(bool)
-	if !ok {
-		return false, errTargetType.New("value is not bool")
-	}
-	return f, nil
+	return Bool(def, native)
 }
 
-func (j *JsonGo) As(re interface{}, keys ...interface{}) (err error) {
-	bytes, err := j.Byte(keys...)
+func (j *JsonGo) BoolN(def bool, keys ...interface{}) bool {
+	t, err := j.Bool(def, keys...)
 	if err != nil {
-		return err
+		zlog.Warn(err)
 	}
-	err = json.Unmarshal(bytes, &re)
-	if err != nil {
-		return errTargetType.New("JSON.As fail:can't as [%T] from:%s,err:%s", re, string(bytes), err.Error())
-	}
-	return nil
+	return t
 }

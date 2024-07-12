@@ -1,14 +1,9 @@
 package jsonutil
 
 import (
-	"regexp"
+	"gitee.com/dk83/goutils/errs"
 	"strconv"
 	"strings"
-)
-
-var (
-	regJsonMap, _   = regexp.Compile("^\\{.*\\}$")
-	regJsonArray, _ = regexp.Compile("^\\[.*\\]$")
 )
 
 func getkeys(keys []interface{}) ([]interface{}, error) {
@@ -27,7 +22,7 @@ func getkeys(keys []interface{}) ([]interface{}, error) {
 	return keys, nil
 }
 func _getkeys(key string) []interface{} {
-	var keys []interface{}
+	keys := make([]interface{}, 0)
 	if key == "" {
 		return keys
 	}
@@ -52,6 +47,24 @@ func _changeKeys(keys *[]interface{}) *[]interface{} {
 		}
 	}
 	return keys
+}
+
+//设置interface中的值，只支持map和数组
+func checkKeys(keys ...interface{}) error {
+	for _, key := range keys {
+		kStr, isStr := key.(string)
+		if isStr && kStr == "" {
+			return errs.ErrValidate.New("key is string but empty!")
+		}
+		kInt, isInt := key.(int)
+		if isStr && kInt < -1 {
+			return errs.ErrValidate.New("key is int but not effective!:%d", kInt)
+		}
+		if !isStr && !isInt {
+			return errs.ErrValidate.New("key type is not support %T", key)
+		}
+	}
+	return nil
 }
 func getInt(str string) (int, error) {
 	return strconv.Atoi(str)

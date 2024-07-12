@@ -2,21 +2,10 @@ package jsonutil
 
 import (
 	"encoding/json"
+	"gitee.com/dk83/goutils/errs"
 	"gitee.com/dk83/goutils/zlog"
 	"reflect"
 	"strings"
-)
-
-type jsonType byte
-
-const (
-	jsonUnkonw jsonType = iota
-	jsonMap
-	jsonArray
-	jsonString
-	jsonInt
-	jsonFloat
-	jsonBool
 )
 
 type JsonGo struct {
@@ -42,105 +31,163 @@ func (j *JsonGo) arrayData() (*[]*JsonGo, error) {
 	}
 	return nil, errJsonType.New("target is not a Array")
 }
-func (j *JsonGo) from(f *JsonGo) {
-	j.v = f.v
-	j._type = f._type
+func (j *JsonGo) ReNew(val interface{}) error {
+	f, ok := val.(JsonGo)
+	if ok {
+		j.v = f.v
+		j._type = f._type
+		return nil
+	}
+
+	_j, err := NewJsonGo(val)
+	if err != nil {
+		zlog.ErrorStack(err)
+		return err
+	}
+	j.v = _j.v
+	j._type = _j._type
+	return nil
+}
+func (j *JsonGo) from(val interface{}) error {
+	f, ok := val.(JsonGo)
+	if ok {
+		j.v = f.v
+		j._type = f._type
+		return nil
+	}
+
+	_j, err := NewJsonGo(val)
+	if err != nil {
+		return err
+	}
+	j.v = _j.v
+	j._type = _j._type
+	return nil
 }
 func mkJsonGoByBytes(bytes []byte, re *JsonGo) error {
 	if bytes == nil {
-		return errValid.New("input is nil when mkJsonGoByBytes")
+		return errs.ErrValidate.New("input is nil when mkJsonGoByBytes")
 	}
 	//defer re.covert()
 	err := json.Unmarshal(bytes, &re.v)
-	if err == nil {
-		_map, ok := re.v.(map[string]interface{})
-		if ok {
-			re.v = _map
-			re._type = jsonMap
-			return nil
-		}
-		_array, ok := re.v.([]interface{})
-		if ok {
-			re.v = _array
-			re._type = jsonArray
-			return nil
-		}
+	if err != nil {
+		return err
+	}
+	_map, ok := re.v.(map[string]interface{})
+	if ok {
+		re.v = _map
+		re._type = jsonMap
+		return nil
+	}
+	_array, ok := re.v.([]interface{})
+	if ok {
+		re.v = _array
+		re._type = jsonArray
+		return nil
+	}
+	return errs.ErrValidate.New("mkJsonGoByBytes success but result is not a Map or Array")
+}
+func (j *JsonGo) As(re interface{}, keys ...interface{}) (err error) {
+	bytes, err := j.Byte(keys...)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(bytes, &re)
+	if err != nil {
+		return errTargetType.New("JsonGo.As fail:can't as [%T] from:%s,err:%s", re, string(bytes), err.Error())
 	}
 	return nil
 }
-
-func (j *JsonGo) covert() {
+func (j *JsonGo) covert() error {
 	if j == nil {
-		return
+		return errNewJsonGo.New("covert fail j is nil")
 	}
 	if j._type == jsonMap {
 		mapData, ok := j.v.(map[string]interface{})
 		if !ok {
-			zlog.ErrorStackShrot("covert jsonMap error! %T", j.v)
-			return
+			return errJsonType.New("target is not a Map: %T", j.v)
 		}
 		v := make(map[string]*JsonGo)
 		for key, value := range mapData {
-			v[key] = NewJsonGo(value)
+			jsonGo, err := NewJsonGo(value)
+			if err != nil {
+				return err
+			}
+			v[key] = jsonGo
 		}
 		j.v = v
 	}
 	if j._type == jsonArray {
 		arrayData, ok := j.v.([]interface{})
 		if !ok {
-			zlog.Error("covert jsonArray error!")
-			return
+			return errJsonType.New("target is not a Array: %T", j.v)
 		}
 		v := make([]*JsonGo, 0)
 		for _, value := range arrayData {
-			v = append(v, NewJsonGo(value))
+			jsonGo, err := NewJsonGo(value)
+			if err != nil {
+				return err
+			}
+			v = append(v, jsonGo)
 		}
 		j.v = v
 	}
+	return nil
 }
-func NewJsonGo(data interface{}) *JsonGo {
+func NewJsonGo(data interface{}) (_r *JsonGo, _e error) {
 	if data == nil {
-		return nil
+		return nil, errs.ErrValidate.New("data is nil when NewJsonGo")
 	}
 	re := &JsonGo{}
-	_dataJson, ok := data.(JsonGo)
+	_dataJson, ok := data.(*JsonGo)
 	if ok {
-		return &_dataJson
+		return _dataJson, nil
 	}
-	defer re.covert()
+	defer func() {
+		if err := re.covert(); err != nil {
+			zlog.Error("NewJsonGo err! %v", err)
+			_r = nil
+			_e = err
+		}
+	}()
 	_map, ok := data.(map[string]interface{})
 	if ok {
 		re.v = _map
 		re._type = jsonMap
-		return re
+		return re, nil
 	}
 	_array, ok := data.([]interface{})
 	if ok {
 		re.v = _array
 		re._type = jsonArray
-		return re
+		return re, nil
 	}
 	_dataByte, ok := data.([]byte)
 	if ok {
 		mkJsonGoByBytes(_dataByte, re)
-		return re
+		return re, nil
 	}
 	if reflect.TypeOf(data).Kind() == reflect.Ptr {
 		dataByte, err := json.Marshal(data)
 		if err != nil {
-			zlog.Error("NewJSON translate to byte[] fail,:", err, "data:", data)
-			return nil
+			return nil, errNewJsonGo.New(err, "NewJSON translate to byte[] fail,[%T]%v", data, data)
 		}
-		mkJsonGoByBytes(dataByte, re)
-		return re
+		err = mkJsonGoByBytes(dataByte, re)
+		if err != nil {
+			return nil, errNewJsonGo.New(err, "mkJsonGoByBytes fail,[%T]%v", data, data)
+		}
+		return re, nil
 	}
 
 	_dataStr, ok := data.(string)
 	if ok {
 		_dataByte = []byte(strings.Trim(_dataStr, " "))
 		if regJsonMap.Match(_dataByte) || regJsonArray.Match(_dataByte) {
-			mkJsonGoByBytes(_dataByte, re)
-			return re
+			err := mkJsonGoByBytes(_dataByte, re)
+			if err != nil {
+				zlog.Warn("%s,input:%s", err.Error(), _dataStr)
+			}
+			return re, nil
 		}
 	}
 	switch data.(type) {
@@ -156,5 +203,5 @@ func NewJsonGo(data interface{}) *JsonGo {
 		re._type = jsonUnkonw
 	}
 	re.v = data
-	return re
+	return re, nil
 }

@@ -2,6 +2,7 @@ package test
 
 import (
 	"fmt"
+	"gitee.com/dk83/goutils/errs"
 	"gitee.com/dk83/goutils/zlog"
 	"reflect"
 	"testing"
@@ -92,4 +93,31 @@ func TestArray(t *testing.T) {
 	s := []int{1}
 	ints := s[:0]
 	zlog.Info(ints)
+}
+
+var (
+	errUnReached  = errs.Err(9001, "xx") //不应该到达的错误
+	errValid      = errs.Err(9002, "xx") //校验错误
+	errJsonType   = errs.Err(9003, "xx") //json数据类型错误
+	errTarget     = errs.Err(9004, "xx") //目标错误
+	errTargetType = errs.Err(9005, "xx") //目标类型错误
+)
+
+func TestErr(t *testing.T) {
+	defer errs.Recover()
+	//errs.Err(9001, "xx232")    //不应该到达的错误
+
+	err1 := errUnReached.New("errUnReached")
+	err2 := errs.ErrSystem.New(err1, "ErrSystem")
+
+	zlog.Info(errUnReached.Is(err1))
+	zlog.Info(errUnReached.Is(err2))
+	zlog.Info(errUnReached.Msg(err1))
+	zlog.Info(errUnReached.Msg(err2))
+	zlog.Info(errs.ErrSystem.Is(err1))
+	zlog.Info(errs.ErrSystem.Is(err2))
+	zlog.Info(errs.ErrSystem.Msg(err1))
+	zlog.Info(errs.ErrSystem.Msg(err2))
+	zlog.Info(err1)
+	zlog.Info(err2)
 }

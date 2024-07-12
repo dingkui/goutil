@@ -56,7 +56,7 @@ func RunTool(exePath string, cmdOut **exec.Cmd, args ...string) (err error, exit
 	}
 
 	var isTimeout bool
-	err, isTimeout = cmdRunWithTimeout(cmd, time.Duration(3600*time.Minute))
+	err, isTimeout = cmdRunWithTimeout(cmd, 3600*time.Minute)
 	if isTimeout {
 		exitCode = -1
 		return fmt.Errorf("time out"), exitCode, "time out"
@@ -83,40 +83,4 @@ func RunTool(exePath string, cmdOut **exec.Cmd, args ...string) (err error, exit
 
 	outStr = out.String()
 	return nil, exitCode, outStr
-}
-
-func ConvertVideo(ffempgPath, src, dst string) {
-	//ffmpeg  -y -i  DFUD0404.mp4 -vcodec h264 -loglevel quiet    -vf scale='if(gt(a,320/500),320,-1)':'if(gt(a,320/500),-1,320)':force_original_aspect_ratio=decrease,pad='iw+mod(iw\,2)':'ih+mod(ih\,2)'  DFUD04042.mp4
-	cmdline := make([]string, 0)
-	cmdline = append(cmdline, "-y")
-	cmdline = append(cmdline, "-i", src)
-	cmdline = append(cmdline, "-vcodec", "h264", "-loglevel", "quiet", "-vf", "scale='if(gt(a,320/500),320,-1)':'if(gt(a,320/500),-1,320)':force_original_aspect_ratio=decrease,pad='iw+mod(iw\\,2)':'ih+mod(ih\\,2)'")
-	cmdline = append(cmdline, dst)
-	//zlog.Debug(strings.Join(cmdline," "))
-	RunTool(ffempgPath, nil, cmdline...)
-
-}
-
-func GenVideoThumb(ffempgPath, src, dst string) {
-	//ffmpeg -i C:\Users\DELL\Music\gg.mp4 -y -f image2 -t 1 -frames:v 1 3.jpg
-	cmdline := make([]string, 0)
-	cmdline = append(cmdline, "-y")
-	cmdline = append(cmdline, "-i", src)
-	cmdline = append(cmdline, "-f", "image2", "-t", "1", "-frames:v", "1")
-	cmdline = append(cmdline, dst)
-
-	//zlog.Debug(strings.Join(cmdline," "))
-	RunTool(ffempgPath, nil, cmdline...)
-}
-
-//文件格式转换
-func ConvertFileType(ffempgPath, src, dst string) {
-	cmdline := make([]string, 0)
-	cmdline = append(cmdline, "-i", src)
-	//cmdline = append(cmdline, "-codec:a")
-	//cmdline = append(cmdline, "libmp3lame")
-	//cmdline = append(cmdline, "-b:a")
-	//cmdline = append(cmdline, "64k")
-	cmdline = append(cmdline, dst)
-	RunTool(ffempgPath, nil, cmdline...)
 }

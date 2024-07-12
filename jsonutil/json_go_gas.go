@@ -3,7 +3,7 @@ package jsonutil
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/zlog"
+	"gitee.com/dk83/goutils/errs"
 )
 
 func (j *JsonGo) getItem(key interface{}) (*JsonGo, error) {
@@ -19,7 +19,7 @@ func (j *JsonGo) getItem(key interface{}) (*JsonGo, error) {
 		}
 		item, ok := data[key.(string)]
 		if !ok {
-			return nil, errTarget.New("get [%s] from:%v", key, data)
+			return nil, errKey.New("get [%s] from:%#q", key, data)
 		}
 		return item, nil
 	case int:
@@ -31,11 +31,11 @@ func (j *JsonGo) getItem(key interface{}) (*JsonGo, error) {
 		l := len(*data)
 		if i < 0 || i >= l {
 			//超出下标返回最后一个元素
-			return nil, errTarget.New("index is out of range :%d", i)
+			return nil, errKey.New("index is out of range :%d ,from %#q", i, data)
 		}
 		return (*data)[i], nil
 	}
-	return nil, errUnReached.New("getItem fail:[%T] %v %v", j, key, key)
+	return nil, errs.ErrSystem.New("getItem fail:[%T] %v %v", j, key, key)
 }
 
 func (j *JsonGo) Get(keys ...interface{}) (*JsonGo, error) {
@@ -61,19 +61,12 @@ func (j *JsonGo) Get(keys ...interface{}) (*JsonGo, error) {
 	return item, nil
 }
 
-// GetN 取值，取不到时返回空对象
-func (j *JsonGo) GetN(keys ...interface{}) *JsonGo {
-	value, err := j.Get(keys...)
-	if err != nil {
-		zlog.ErrorStackShrot(err)
-		return &JsonGo{}
-	}
-	return value
-}
-
 // setValue 设置interface中的值，只支持map和数组
 func (j *JsonGo) setValue(key interface{}, val interface{}) (*JsonGo, error) {
-	v := NewJsonGo(val)
+	v, err := NewJsonGo(val)
+	if err != nil {
+		return nil, err
+	}
 	switch key.(type) {
 	case int:
 		data, err := j.arrayData()
@@ -85,7 +78,8 @@ func (j *JsonGo) setValue(key interface{}, val interface{}) (*JsonGo, error) {
 		l := len(*data)
 
 		if i < -1 || i > l {
-			return nil, errTarget.New("setValue fail:%s[%d] is invalid.index value in(-1,%d) means append item,otherwise replace the item", j.Str(), i, l)
+			str, _ := j.Str("")
+			return nil, errTarget.New("setValue fail:%s[%d] is invalid.index value in(-1,%d) means append item,otherwise replace the item", str, i, l)
 		}
 		if i == -1 || i == l {
 			j.v = append(*data, v)
@@ -101,7 +95,7 @@ func (j *JsonGo) setValue(key interface{}, val interface{}) (*JsonGo, error) {
 		data[key.(string)] = v
 		return v, nil
 	}
-	return nil, errUnReached.New(fmt.Sprintf("setItem type is not support %T", j))
+	return nil, errs.ErrSystem.New(fmt.Sprintf("setItem type is not support %T", j))
 }
 
 // setValue 设置interface中的值，只支持map和数组
@@ -118,7 +112,8 @@ func (j *JsonGo) removeValue(key interface{}) error {
 		l := len(_data)
 
 		if i < -1 || i > l-1 || l == 0 {
-			return errTarget.New("removeValue fail:%s[%d] is invalid.index value in(-1) means remove last item", j.Str(), i, l)
+			str, _ := j.Str("")
+			return errTarget.New("removeValue fail:%s[%d] is invalid.index value in(-1) means remove last item", str, i, l)
 		}
 		if i == -1 {
 			j.v = _data[:l-1]
@@ -134,13 +129,13 @@ func (j *JsonGo) removeValue(key interface{}) error {
 		delete(data, key.(string))
 		return nil
 	}
-	return errUnReached.New(fmt.Sprintf("removeValue type is not support %T", key))
+	return errs.ErrSystem.New(fmt.Sprintf("removeValue type is not support %T", key))
 }
 
-// Set 设置interface中的值，支持多级设置，支持map,数组和json字符串
+// Remove Set 设置interface中的值，支持多级设置，支持map,数组和json字符串
 func (j *JsonGo) Remove(keys ...interface{}) error {
 	if len(keys) == 0 {
-		return errValid.New("remove key is empty")
+		return errs.ErrValidate.New("remove key is empty")
 	}
 
 	keys, err := getkeys(keys)
@@ -162,8 +157,7 @@ func (j *JsonGo) Remove(keys ...interface{}) error {
 // Set 设置interface中的值，支持多级设置，支持map,数组和json字符串
 func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 	if len(keys) == 0 {
-		j.from(NewJsonGo(val))
-		return nil
+		return j.from(val)
 	}
 
 	keys, err := getkeys(keys)
@@ -176,13 +170,13 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 		_item, err := item.getItem(key)
 		if err != nil {
 			//遇到不存在的key,创建对象
-			if errTarget.Is(err) {
+			if errKey.Is(err) {
 				addVas := val
 				//遇到不存在的key,创建对象
 				if indx < len(keys)-1 {
 					switch keys[indx+1].(type) {
 					case int:
-						addVas = []interface{}{}
+						addVas = make([]interface{}, 0)
 					case string:
 						addVas = make(map[string]interface{})
 					}
@@ -198,6 +192,5 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 		item = _item
 	}
 
-	item.from(NewJsonGo(val))
-	return nil
+	return item.from(val)
 }

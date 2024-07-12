@@ -3,62 +3,11 @@ package jsonutil
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"gitee.com/dk83/goutils/apputil"
-	"gitee.com/dk83/goutils/fileutil"
 	"gitee.com/dk83/goutils/zlog"
-	"io/ioutil"
-	"os"
-	"path/filepath"
+	"strconv"
+	"strings"
 )
-
-func Read_json_file(file string) map[string]interface{} {
-	b, e := ioutil.ReadFile(file)
-	if e != nil {
-		return nil
-	}
-	rs := make(map[string]interface{})
-	e = json.Unmarshal(b, &rs)
-	return rs
-}
-
-func Readdata_json_file(file string) []byte {
-	data, err := ioutil.ReadFile(file)
-	if err != nil {
-		return data
-	}
-	return nil
-}
-
-func Write_formatjson_file(file string, data map[string]interface{}) {
-	b, e := json.Marshal(data)
-	if e != nil {
-		zlog.Error(e)
-		panic(e)
-		return
-	}
-
-	os.MkdirAll(filepath.Dir(file), os.ModePerm)
-	fileutil.WriteAndSyncFile(file, formatJson(b, true), os.ModePerm)
-	//ioutil.WriteFile(file,b,os.ModePerm)
-}
-func Write_json_file(file string, data map[string]interface{}) {
-	b, e := json.Marshal(data)
-	if e != nil {
-		zlog.Error(e)
-		panic(e)
-		return
-	}
-
-	os.MkdirAll(filepath.Dir(file), os.ModePerm)
-	fileutil.WriteAndSyncFile(file, format(b), os.ModePerm)
-	//ioutil.WriteFile(file,b,os.ModePerm)
-}
-
-func format(input []byte) []byte {
-	return formatJson(input, apputil.IsPara("formatJson"))
-}
 
 func formatJson(input []byte, format bool) []byte {
 	if !format {
@@ -78,219 +27,123 @@ func CopyMapVal(target map[string]interface{}, source map[string]interface{}, ke
 	}
 }
 
-func Get_bytes(data map[string]interface{}) []byte {
+func Str(def string, data interface{}) (string, error) {
+	switch data.(type) {
+	case *JsonFile:
+		return data.(*JsonFile).Str(def)
+	case *JsonGo:
+		return data.(*JsonGo).Str(def)
+	case string:
+		return data.(string), nil
+	case int:
+		return strconv.Itoa(data.(int)), nil
+	case []byte:
+		return string(data.([]byte)), nil
+	}
+
 	b, e := json.Marshal(data)
-	if e == nil {
-		return b
+	if e != nil {
+		return def, e
 	}
-	return nil
+
+	return string(b), nil
 }
 
-func Data2Json(data interface{}) string {
-	b, e := json.Marshal(data)
-	if e == nil {
-		return string(format(b))
-	}
-	return ""
-}
-func Json2Map(data string) (rs map[string]interface{}) {
-	err := json.Unmarshal([]byte(data), &rs)
+func StrN(def string, data interface{}) string {
+	str, err := Str(def, data)
 	if err != nil {
-		return nil
+		zlog.Error(err)
 	}
-	return rs
+	return str
 }
-
-//取得interface中的值，只支持map和数组
-func getItem(data interface{}, key interface{}) (interface{}, error) {
+func Byte(data interface{}) ([]byte, error) {
 	if data == nil {
-		return nil, errors.New("data is nil")
+		return nil, errTargetType.New("value is not Bytes")
+	}
+	switch data.(type) {
+	case *JsonGo:
+		return data.(*JsonGo).Byte()
+	case *JsonFile:
+		return data.(*JsonFile).Byte()
+	case string:
+		return []byte(data.(string)), nil
 	}
 
-	_dataMap, ok := data.(map[string]interface{})
-	if ok {
-		_key, ok := key.(string)
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("map key type is error %T", key))
-		}
-		return _dataMap[_key], nil
-	}
-	_dataArray, ok := data.([]interface{})
-	if ok {
-		_key, ok := key.(int)
-		if !ok {
-			return nil, errors.New(fmt.Sprintf("array key type is error %T", key))
-		}
-		if _key >= len(_dataArray) {
-			return nil, errors.New(fmt.Sprintf("index out of range:[%d] with length %d", _key, len(_dataArray)))
-		}
-		return _dataArray[_key], nil
-	}
-	return nil, errors.New(fmt.Sprintf("setItem type is not sopport %T", data))
+	return json.Marshal(data)
 }
+func Bool(def bool, data interface{}) (bool, error) {
 
-//设置interface中的值，只支持map和数组
-func setItem(data interface{}, val interface{}, key interface{}) error {
 	if data == nil {
-		return errors.New("data is nil")
+		return def, errTargetType.New("value is not Bool")
 	}
-	_dataMap, ok := data.(map[string]interface{})
-	if ok {
-		_key, ok := key.(string)
-		if !ok {
-			return errors.New(fmt.Sprintf("map key type is error %T", key))
-		}
-		_dataMap[_key] = val
-		return nil
-	}
-	_dataArray, ok := data.([]interface{})
-	if ok {
-		_key, ok := key.(int)
-		if !ok {
-			return errors.New(fmt.Sprintf("array key type is error %T", key))
-		}
-		if _key >= len(_dataArray) {
-			return errors.New(fmt.Sprintf("index out of range:[%d] with length %d", _key, len(_dataArray)))
-		}
-		_dataArray[_key] = val
-		return nil
-	}
-	return errors.New(fmt.Sprintf("setItem type is not sopport %T", data))
-}
 
-//设置interface中的值，只支持map和数组
-func checkKeys(keys ...interface{}) error {
-	for _, key := range keys {
-		kStr, isStr := key.(string)
-		if isStr && kStr == "" {
-			return errValid.New("key is string but emputy!")
-		}
-		kInt, isInt := key.(int)
-		if isStr && kInt < -1 {
-			return errValid.New("key is int but not effective!:%d", kInt)
-		}
-		if !isStr && !isInt {
-			return errValid.New("key type is not sopport %T", key)
-		}
+	if data == nil {
+		return false, nil
 	}
-	return nil
-}
+	switch data.(type) {
+	case bool:
+		return data.(bool), nil
+	case string:
+		str := strings.ToLower(data.(string))
+		return str != "false" && str != "0" && str != "", nil
+	case int:
+		i := data.(int)
+		return i != 0, nil
+	case *JsonGo:
+		return data.(*JsonGo).Bool(def)
+	case *JsonFile:
+		return data.(*JsonFile).Bool(def)
+	}
 
-//设置interface中的值，支持多级设置，支持map,数组和json字符串
-func SetItem(data interface{}, val interface{}, keys ...interface{}) interface{} {
-	err := checkKeys(keys...)
-	if err != nil {
-		zlog.Error(err)
-		return nil
+	return def, errTargetType.New("value is not Bool")
+}
+func Int(def int, data interface{}) (int, error) {
+	if data == nil {
+		return def, errTargetType.New("value is not Int")
 	}
-	var result interface{}
-	_dataStr, isString := data.(string)
-	if isString {
-		err := json.Unmarshal([]byte(_dataStr), &data)
+	switch data.(type) {
+	case int:
+		i := data.(int)
+		return i, nil
+	case string:
+		num, err := strconv.Atoi(data.(string))
 		if err != nil {
-			zlog.Error(err)
-			return nil
+			return def, err
 		}
+		return num, nil
+	case *JsonGo:
+		return data.(*JsonGo).Int(def)
+	case *JsonFile:
+		return data.(*JsonFile).Int(def)
 	}
-	if len(keys) == 1 {
-		err := setItem(data, val, keys[0])
-		if err != nil {
-			zlog.Error(err)
-			return nil
-		}
-		result = data
-	} else if len(keys) > 1 {
-		item, err := getItem(data, keys[0])
-		if err != nil {
-			zlog.Error(err)
-			return nil
-		}
-		if item == nil {
-			_, ok := keys[1].(string)
-			if ok {
-				item = make(map[string]interface{})
-			} else {
-				len, ok := keys[1].(int)
-				if ok {
-					item = make([]interface{}, len+1)
-				}
-			}
-		}
-		result = SetItem(item, val, keys[1:]...)
-	}
-	if isString {
-		return Data2Json(result)
-	}
-	return result
-}
 
-//取得interface中的值，支持map，数组和json字符串
-func GetItem(data interface{}, keys ...interface{}) interface{} {
-	err := checkKeys(keys...)
-	if err != nil {
-		zlog.Error(err)
-		return nil
+	return def, errTargetType.New("value is not Int")
+}
+func Float(def float64, data interface{}) (float64, error) {
+	if data == nil {
+		return def, errTargetType.New("value is not Float")
 	}
-	if len(keys) == 0 || data == nil {
-		return data
-	}
-	_dataStr, ok := data.(string)
-	if ok {
-		err := json.Unmarshal([]byte(_dataStr), &data)
+	switch data.(type) {
+	case float64:
+		i := data.(float64)
+		return i, nil
+	case int:
+		num, err := strconv.ParseFloat(fmt.Sprintf("%d", data), 64)
 		if err != nil {
-			zlog.Error(err)
-			return nil
+			return def, err
 		}
+		return num, nil
+	case string:
+		num, err := strconv.ParseFloat(data.(string), 64)
+		if err != nil {
+			return def, err
+		}
+		return num, nil
+	case *JsonGo:
+		return data.(*JsonGo).Float(def)
+	case *JsonFile:
+		return data.(*JsonFile).Float(def)
 	}
-	item, err := getItem(data, keys[0])
-	if err != nil {
-		zlog.Error(err)
-		return nil
-	}
-	return GetItem(item, keys[1:]...)
-}
 
-func GetArray(data interface{}, key ...interface{}) []interface{} {
-	item := GetItem(data, key...)
-	if item == nil {
-		return nil
-	}
-	i, ok := item.([]interface{})
-	if ok {
-		return i
-	}
-	return nil
-}
-func GetMap(data interface{}, key ...interface{}) map[string]interface{} {
-	item := GetItem(data, key...)
-	if item == nil {
-		return nil
-	}
-	m, ok := item.(map[string]interface{})
-	if ok {
-		return m
-	}
-	return nil
-}
-
-func GetString(data interface{}, key ...interface{}) (string, error) {
-	item := GetItem(data, key...)
-	if item == nil {
-		return "", errors.New("not exsits")
-	}
-	return item.(string), nil
-}
-func GetNum(data interface{}, key ...interface{}) (float64, error) {
-	item := GetItem(data, key...)
-	if item == nil {
-		return 0, errors.New("not exsits")
-	}
-	return item.(float64), nil
-}
-func GetBool(data interface{}, key ...interface{}) (bool, error) {
-	item := GetItem(data, key...)
-	if item == nil {
-		return false, errors.New("not exsits")
-	}
-	return item.(bool), nil
+	return def, errTargetType.New("value is not Float")
 }
