@@ -3,7 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"gitee.com/dk83/goutils/zlog"
+	"gitee.com/dk83/goutils/dlog"
 	"io/ioutil"
 	"net/http"
 )
@@ -38,7 +38,7 @@ func remoteLogger(level string, msg string, caller string) {
 
 	req, err := http.NewRequest("POST", ApiHost+"/s/log", bytes.NewReader(b))
 	if err != nil {
-		zlog.ERROR.LogLocal("日志网络故障-101:" + err.Error())
+		dlog.ERROR.LogLocal("日志网络故障-101:" + err.Error())
 		return
 	}
 	req.Header.Add("Content-Type", "application/json;charset=UTF-8")
@@ -47,16 +47,16 @@ func remoteLogger(level string, msg string, caller string) {
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		zlog.ERROR.LogLocal("日志网络故障-102：" + err.Error())
+		dlog.ERROR.LogLocal("日志网络故障-102：" + err.Error())
 		return
 	}
 	if resp.StatusCode != 200 {
-		zlog.WARN.LogLocal("日志网络故障-104：%d", resp.StatusCode)
+		dlog.WARN.LogLocal("日志网络故障-104：%d", resp.StatusCode)
 	}
 	defer resp.Body.Close()
 	_, err = ioutil.ReadAll(resp.Body)
 	if err != nil {
-		zlog.ERROR.LogLocal("日志网络故障-103：" + err.Error())
+		dlog.ERROR.LogLocal("日志网络故障-103：" + err.Error())
 		return
 	}
 }

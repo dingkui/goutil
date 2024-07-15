@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
+	"gitee.com/dk83/goutils/dlog"
 	"gitee.com/dk83/goutils/errs"
-	"gitee.com/dk83/goutils/zlog"
 	"reflect"
 	"testing"
 )
@@ -92,7 +92,7 @@ func TestCheckType2(t *testing.T) {
 func TestArray(t *testing.T) {
 	s := []int{1}
 	ints := s[:0]
-	zlog.Info(ints)
+	dlog.Info(ints)
 }
 
 var (
@@ -110,14 +110,14 @@ func TestErr(t *testing.T) {
 	err1 := errUnReached.New("errUnReached")
 	err2 := errs.ErrSystem.New(err1, "ErrSystem")
 
-	zlog.Info(errUnReached.Is(err1))
-	zlog.Info(errUnReached.Is(err2))
-	zlog.Info(errUnReached.Msg(err1))
-	zlog.Info(errUnReached.Msg(err2))
-	zlog.Info(errs.ErrSystem.Is(err1))
-	zlog.Info(errs.ErrSystem.Is(err2))
-	zlog.Info(errs.ErrSystem.Msg(err1))
-	zlog.Info(errs.ErrSystem.Msg(err2))
-	zlog.Info(err1)
-	zlog.Info(err2)
+	dlog.Info(errUnReached.Is(err1))
+	dlog.Info(errUnReached.Is(err2))
+	dlog.Info(errUnReached.Msg(err1))
+	dlog.Info(errUnReached.Msg(err2))
+	dlog.Info(errs.ErrSystem.Is(err1))
+	dlog.Info(errs.ErrSystem.Is(err2))
+	dlog.Info(errs.ErrSystem.Msg(err1))
+	dlog.Info(errs.ErrSystem.Msg(err2))
+	dlog.Info(err1)
+	dlog.Info(err2)
 }

@@ -2,8 +2,8 @@ package myfs
 
 import (
 	"encoding/json"
+	"gitee.com/dk83/goutils/dlog"
 	oss "gitee.com/dk83/goutils/rfs/alioss"
-	"gitee.com/dk83/goutils/zlog"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -31,7 +31,7 @@ func changeFsResultToListObjectsResult(result *ListObjectsResult, re *oss.ListOb
 func serviceErr(body []byte, statusCode int, requestID string) (oss.ServiceError, error) {
 	var jsonRe ObjectsResult
 	var storageErr oss.ServiceError
-	zlog.Error("body:%s", string(body))
+	dlog.Error("body:%s", string(body))
 	err := json.Unmarshal(body, &jsonRe)
 
 	if err == nil {

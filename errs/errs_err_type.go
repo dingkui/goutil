@@ -2,8 +2,7 @@ package errs
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/stringutil"
-	"gitee.com/dk83/goutils/zlog"
+	"gitee.com/dk83/goutils/native"
 )
 
 type ErrType struct {
@@ -14,8 +13,8 @@ type ErrType struct {
 
 func (e *ErrType) Trace(err error, msg interface{}, a ...interface{}) error {
 	trace := []*errInfo{{t: e,
-		m: stringutil.Fmt(msg, a...),
-		a: zlog.GetCaller(2),
+		m: native.StringUtil.Fmt(msg, a...),
+		a: native.RuntimeUtil.GetCaller(2),
 	}}
 	_e, ok := err.(*Error)
 	if ok {
@@ -28,18 +27,18 @@ func (e *ErrType) New(msg interface{}, a ...interface{}) error {
 	if ok {
 		_msg := e.msg
 		if len(_e.trace) > 0 {
-			_msg = stringutil.Fmt(a[0], a[1:]...)
+			_msg = native.StringUtil.Fmt(a[0], a[1:]...)
 		}
 
 		trace := []*errInfo{{t: e,
 			m: _msg,
-			a: zlog.GetCaller(2),
+			a: native.RuntimeUtil.GetCaller(2),
 		}}
 		return &Error{trace: append(trace, _e.trace...)}
 	} else {
 		return &Error{trace: []*errInfo{{t: e,
-			m: stringutil.Fmt(msg, a...),
-			a: zlog.GetCaller(2),
+			m: native.StringUtil.Fmt(msg, a...),
+			a: native.RuntimeUtil.GetCaller(2),
 		}}}
 	}
 }
