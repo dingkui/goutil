@@ -2,16 +2,9 @@ package errs
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/zlog"
+	"gitee.com/dk83/goutils/native"
 )
 
-func Recover() interface{} {
-	if r := recover(); r != nil {
-		zlog.ErrorStackTrace(3, true, r)
-		return r
-	}
-	return nil
-}
 func Err(code int, msg string) *ErrType {
 	err, exists := _errs[code]
 	if exists {
@@ -22,7 +15,7 @@ func Err(code int, msg string) *ErrType {
 	e := &ErrType{
 		code: code,
 		msg:  msg,
-		addr: zlog.GetCaller(2),
+		addr: native.RuntimeUtil.GetCaller(2),
 	}
 	_errs[code] = e
 	return e
