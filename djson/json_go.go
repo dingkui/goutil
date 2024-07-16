@@ -140,6 +140,13 @@ func (j *JsonGo) covert() error {
 	}
 	return nil
 }
+func NewJsonMap() *JsonGo {
+	jsonGo, _ := NewJsonGo(make(map[string]interface{}))
+	return jsonGo
+}
+func NewJsonArray() (_r *JsonGo, _e error) {
+	return NewJsonGo(make([]interface{}, 0))
+}
 func NewJsonGo(data interface{}) (_r *JsonGo, _e error) {
 	if data == nil {
 		return nil, errs.ErrValidate.New("data is nil when NewJsonGo")

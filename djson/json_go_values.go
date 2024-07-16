@@ -18,6 +18,15 @@ func (j *JsonGo) Native(keys ...interface{}) (interface{}, error) {
 	return t.v, nil
 }
 
+// NativeN 获取原生数据
+func (j *JsonGo) NativeN(keys ...interface{}) interface{} {
+	t, err := j.Native(keys...)
+	if err != nil {
+		dlog.Warn(err)
+	}
+	return t
+}
+
 func (j *JsonGo) NativeArray(keys ...interface{}) ([]interface{}, error) {
 	t, err := j.Get(keys...)
 	if err != nil {

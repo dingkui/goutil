@@ -2,10 +2,10 @@ package dhttp
 
 import "io"
 
-type ProgressEventType int
+type ProgressEventType byte
 
 const (
-	ReqStartedEvent ProgressEventType = 1 + iota
+	ReqStartedEvent ProgressEventType = iota
 	ReqDataEvent
 	ReqCompletedEvent
 	ReqFailedEvent
@@ -58,14 +58,13 @@ func (t progress) reqData(rwBytes int64) {
 		t.listener.ProgressChanged(ReqDataEvent.mkEvent(t.sta, rwBytes))
 	}
 }
-func (t progress) reqFailed() {
+func (t progress) reqEnd() {
 	if t.listener != nil {
-		t.listener.ProgressChanged(ReqFailedEvent.mkEvent(t.sta, 0))
-	}
-}
-func (t progress) reqCompleted() {
-	if t.listener != nil {
-		t.listener.ProgressChanged(ReqCompletedEvent.mkEvent(t.sta, 0))
+		if t.sta.consumedBytes == t.sta.totalBytes {
+			t.listener.ProgressChanged(ReqCompletedEvent.mkEvent(t.sta, 0))
+		} else {
+			t.listener.ProgressChanged(ReqFailedEvent.mkEvent(t.sta, 0))
+		}
 	}
 }
 
@@ -102,7 +101,7 @@ func (t *teeReader) Read(p []byte) (n int, err error) {
 
 	// Read encountered error
 	if err != nil && err != io.EOF {
-		t.progress.reqFailed()
+		return n, err
 	}
 
 	if n > 0 {
@@ -126,12 +125,6 @@ func (t *teeReader) Close() error {
 	}
 	return nil
 }
-
-// TeeReader returns a Reader that writes to w what it reads from r.
-// All reads from r performed through it are matched with
-// corresponding writes to w.  There is no internal buffering -
-// the write must complete before the read completes.
-// Any error encountered while writing is reported as a read error.
 func newTeeReader(reader io.Reader, writer io.Writer, listener ProgressListener, totalBytes int64) (io.ReadCloser, *progress) {
 	progress := &progress{
 		listener: listener,

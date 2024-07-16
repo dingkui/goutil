@@ -9,6 +9,7 @@ type errInfo struct {
 	t *ErrType
 	m string
 	a string
+	d interface{}
 }
 type Error struct {
 	trace []*errInfo

@@ -72,7 +72,6 @@ func Byte(data interface{}) ([]byte, error) {
 	return json.Marshal(data)
 }
 func Bool(def bool, data interface{}) (bool, error) {
-
 	if data == nil {
 		return def, errTargetType.New("value is not Bool")
 	}

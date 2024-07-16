@@ -2,6 +2,7 @@ package dhttp
 
 import (
 	"fmt"
+	"gitee.com/dk83/goutils/djson"
 	"net/http"
 	"strconv"
 	"strings"
@@ -39,15 +40,44 @@ const (
 type ContentType string
 
 const (
-	ContentTypeForm   ContentType = "application/x-www-form-urlencoded"
+	ContentTypeForm   ContentType = "application/x-www-form-urlencoded;charset=utf-8"
 	ContentTypeStream ContentType = "application/octet-stream"
-	ContentTypeJson   ContentType = "application/json"
+	ContentTypeJson   ContentType = "application/json;charset=utf-8"
 	ContentTypeXml    ContentType = "application/xml"
 	ContentTypeText   ContentType = "text/plain"
 	ContentTypeHtml   ContentType = "text/html"
 	ContentTypeJpeg   ContentType = "image/jpeg"
 	ContentTypeMpeg   ContentType = "audio/mpeg"
 )
+
+func (ops *Options) AddHeaders(headers *djson.JsonGo) {
+	if headers != nil {
+		m, _ := headers.Map()
+		for key, jsonGo := range m {
+			ops.AddHeader(key, jsonGo.StrN(""))
+		}
+	}
+}
+func (ops *Options) AddHeader(key string, value string) {
+	ops.addOption(key, value, optionHeader)
+}
+func (ops *Options) GetHeaders() map[string]string {
+	headers := make(map[string]string)
+	for _, option := range ops.options {
+		if option.ot == optionHeader {
+			headers[option.key] = option.value.(string)
+		}
+	}
+	return nil
+}
+func (ops *Options) GetHeader(key string) string {
+	for _, option := range ops.options {
+		if option.ot == optionArg && option.key == key {
+			return option.value.(string)
+		}
+	}
+	return ""
+}
 
 // ContentType is an option to set Content-Type header
 func (ops *Options) ContentType(value ContentType) {
@@ -57,6 +87,14 @@ func (ops *Options) ContentType(value ContentType) {
 // ContentLength is an option to set Content-Length header
 func (ops *Options) ContentLength(length int64) {
 	ops.AddHeader(HTTPHeaderContentLength, strconv.FormatInt(length, 10))
+}
+func (ops *Options) GetContentLength() int64 {
+	length := ops.GetHeader(HTTPHeaderContentLength)
+	if length != "" {
+		return 0
+	}
+	num, _ := strconv.ParseInt(length, 10, 64)
+	return num
 }
 
 // CacheControl is an option to set Cache-Control header

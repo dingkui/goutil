@@ -3,6 +3,7 @@ package dhttp
 import (
 	"bytes"
 	"fmt"
+	"gitee.com/dk83/goutils/djson"
 	"io"
 	"net/url"
 	"os"
@@ -26,7 +27,8 @@ func GetURLParams(params map[string]interface{}) string {
 		}
 		buf.WriteString(url.QueryEscape(k))
 		if params[k] != nil {
-			buf.WriteString("=" + strings.Replace(url.QueryEscape(params[k].(string)), "+", "%20", -1))
+			s := djson.StrN("", params[k])
+			buf.WriteString("=" + strings.Replace(url.QueryEscape(s), "+", "%20", -1))
 		}
 	}
 	return buf.String()
@@ -49,9 +51,7 @@ func GetReaderLen(reader io.Reader) (int64, error) {
 			contentLength = fInfo.Size()
 		}
 	case *io.LimitedReader:
-		contentLength = int64(v.N)
-	case *LimitedReadCloser:
-		contentLength = int64(v.N)
+		contentLength = v.N
 	default:
 		err = fmt.Errorf("can't get reader content length,unkown reader type")
 	}
