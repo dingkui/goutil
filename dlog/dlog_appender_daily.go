@@ -53,7 +53,7 @@ func (f *appenderDaily) WriteLog(s string, _ string) (int, error) {
 		return 0, nil
 	}
 	f.busing = true
-	re, err := f.file.WriteString(s)
+	re, err := f.file.WriteString(s + "\n")
 	if err != nil {
 		panic("daily write error:" + s)
 	}

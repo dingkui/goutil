@@ -62,6 +62,10 @@ func (f *remoteAppender) postLog(level string, msg string) bool {
 		}
 	}
 	resp, err := http.DefaultClient.Do(req)
+	if resp == nil {
+		errRemote("日志网络故障-102:%v", err)
+		return false
+	}
 	defer resp.Body.Close()
 	if err != nil {
 		errRemote("日志网络故障-102:%v", err)

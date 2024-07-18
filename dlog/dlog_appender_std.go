@@ -12,7 +12,7 @@ func (f *consoleAppender) Enable(level int) bool {
 	return f.level <= level
 }
 func (f *consoleAppender) WriteLog(s string, _ string) (int, error) {
-	return fmt.Print(s)
+	return fmt.Println(s)
 }
 func (f *consoleAppender) Close() {
 }

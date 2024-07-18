@@ -38,7 +38,7 @@ func init() {
 }
 func log(data *_logInfo) {
 	logType := getType(data.l)
-	info := fmt.Sprintf("%s %s %s: %s\n", data.t, logType.name, data.f, data.m)
+	info := fmt.Sprintf("%s %s %s: %s", data.t, logType.name, data.f, data.m)
 	mu.Lock()
 	defer mu.Unlock()
 	if ready {
