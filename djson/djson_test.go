@@ -1,8 +1,11 @@
 package djson_test
 
 import (
+	"encoding/json"
+	"fmt"
 	"gitee.com/dk83/goutils/djson"
 	"gitee.com/dk83/goutils/dlog"
+	"reflect"
 	"testing"
 )
 
@@ -200,4 +203,53 @@ func TestNewJsonFile(t *testing.T) {
 	file.Remove("@A4")
 	check(t, "file:%s", file, input)
 	check(t, "jsonB1:%s", jsonB1, input)
+}
+func TestInt(t *testing.T) {
+
+	a := 123.3
+	b := djson.N0.IntN(a)
+	c := djson.N0.FloatN(a)
+	d := int(c)
+	check(t, "a:%v", a, "123.3")
+	check(t, "b:%v", b, djson.N0.ToStr())
+	check(t, "c:%v", c, "123.3")
+	check(t, "d:%v", d, "123")
+	check(t, "float64(b):%v", float64(b), unCheck)
+	check(t, "float64(a):%v", float64(a), unCheck)
+	dlog.Info(c == float64(b))
+
+}
+func TestInt2(t *testing.T) {
+	check(t, "N0:%v", djson.N0.IntN(float64(21.1)), unCheck)
+	//check(t, "StrEmpty:%v",  djson.StrEmpty.ToStr(), unCheck)
+	//check(t, "StrEmpty:%v",  djson.N0.IntN(0), unCheck)
+	//check(t, "BoolFalse:%v",  djson.BoolFalse.ToStr(), unCheck)
+
+	//of := reflect.TypeOf("xxx")
+	of := reflect.ValueOf(123.1)
+
+	marshal, _ := json.Marshal(float64(0))
+	dlog.Info(string(marshal))
+	marshal, _ = json.Marshal(float64(0.1))
+	dlog.Info(string(marshal))
+	marshal, _ = json.Marshal(float32(0.0))
+	dlog.Info(string(marshal))
+
+	dlog.Info(fmt.Sprintf("%T", float32(0.0)))
+	dlog.Info(fmt.Sprintf("%v", float64(0)))
+	dlog.Info(of.Float())
+}
+func TestTypes(t *testing.T) {
+	x, _ := djson.NewJsonFile("", nil)
+	x.Set("x", "xxx")
+	var intf interface{} = x
+	x1, ok := intf.(*djson.JsonFile)
+	if ok {
+		dlog.Info("1")
+	}
+	dlog.Info(x1.StrN("x"))
+	_, ok = intf.(*djson.JsonGo)
+	if ok {
+		dlog.Info("2")
+	}
 }

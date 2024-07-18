@@ -112,7 +112,7 @@ func (j *JsonGo) StrN(def string, keys ...interface{}) string {
 	}
 	return t
 }
-func (j *JsonGo) Int(def int, keys ...interface{}) (int, error) {
+func (j *JsonGo) Int(def int64, keys ...interface{}) (int64, error) {
 	t, err := j.Get(keys...)
 	if err != nil {
 		return def, err
@@ -123,7 +123,7 @@ func (j *JsonGo) Int(def int, keys ...interface{}) (int, error) {
 	}
 	return Int(def, native)
 }
-func (j *JsonGo) IntN(def int, keys ...interface{}) int {
+func (j *JsonGo) IntN(def int64, keys ...interface{}) int64 {
 	t, err := j.Int(def, keys...)
 	if err != nil {
 		dlog.Warn(err)

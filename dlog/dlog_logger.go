@@ -14,6 +14,7 @@ type _logInfo struct {
 }
 
 type LogAppender interface {
+	Close()
 	Enable(level int) bool
 	WriteLog(msg string, logName string) (n int, err error)
 }
@@ -37,7 +38,7 @@ func init() {
 }
 func log(data *_logInfo) {
 	logType := getType(data.l)
-	info := fmt.Sprintf("%s %s %s: %s\n", data.t, logType.name, data.f, data.m)
+	info := fmt.Sprintf("%s %s %s: %s", data.t, logType.name, data.f, data.m)
 	mu.Lock()
 	defer mu.Unlock()
 	if ready {
@@ -56,4 +57,12 @@ func AddLogger(nw LogAppender) {
 	ready = false
 	_leveAppender = append(_leveAppender, nw)
 	ready = true
+}
+
+func ClearAppenders() {
+	ready = false
+	for _, w := range _leveAppender {
+		w.Close()
+	}
+	_leveAppender = _leveAppender[:0]
 }

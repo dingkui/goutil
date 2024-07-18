@@ -30,6 +30,9 @@ func TestLog(t *testing.T) {
 func TestTrace(t *testing.T) {
 	testTrace()
 }
+func TestClearAppenders(t *testing.T) {
+	dlog.ClearAppenders()
+}
 func testTrace1() {
 	dlog.ErrorStack("ErrorStack:", "short")
 	dlog.ErrorStackTrace(3, true, "ErrorStackTrace:", "short")

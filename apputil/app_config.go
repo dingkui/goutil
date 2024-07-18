@@ -27,14 +27,14 @@ func InitConfig(configFile string) bool {
 
 func InitLog(conf *djson.JsonGo) bool {
 	logRoot := conf.StrN("../logs", "@logger.logRoot")
-	logFiles, err := Conf.Array("@logger.appender")
+	logFiles, err := conf.Array("@logger.appender")
 	if err != nil {
 		fmt.Sprintf("logConfig is not set: @logger.appender")
 		return false
 	}
 	for _, log := range *logFiles {
 		logType := log.StrN("", "logType")
-		level := log.IntN(1, "level")
+		level := int(log.IntN(1, "level"))
 		switch logType {
 		case "console":
 			dlog.AddAppenderConsole(level)
