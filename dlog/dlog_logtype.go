@@ -74,7 +74,7 @@ func (t logType) LogLocal(v1 interface{}, v ...interface{}) {
 func (t logType) Stack(calldepth int, isShort bool, v1 interface{}, v ...interface{}) {
 	stack := getStack(string(debug.Stack()), 7, calldepth, isShort)
 	msg := native.StringUtil.Fmt(v1, v...)
-	t.log(1, 1, "%s stacks:\n%s", msg, stack)
+	t.log(1, "%s stacks:\n%s", msg, stack)
 }
 
 func getStack(stackInfo string, start int, calldepth int, isShort bool) string {
