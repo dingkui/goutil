@@ -166,6 +166,7 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 	}
 
 	item := j
+
 	for indx, key := range keys {
 		_item, err := item.getItem(key)
 		if err != nil {
@@ -174,12 +175,7 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 				addVas := val
 				//遇到不存在的key,创建对象
 				if indx < len(keys)-1 {
-					switch keys[indx+1].(type) {
-					case int:
-						addVas = make([]interface{}, 0)
-					case string:
-						addVas = make(map[string]interface{})
-					}
+					addVas = getAddVal(keys[indx+1])
 				}
 				_item, err = item.setValue(key, addVas)
 				if err != nil {
@@ -193,4 +189,19 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 	}
 
 	return item.from(val)
+}
+
+func getAddVal(key interface{}) interface{} {
+	err := checkKeys(key)
+	if err != nil {
+		panic(err)
+	}
+
+	switch key.(type) {
+	case int:
+		return make([]interface{}, 0)
+	case string:
+		return make(map[string]interface{})
+	}
+	panic(errs.ErrSystem.New("key type error:%T", key))
 }

@@ -49,7 +49,8 @@ func (f *appenderDaily) init(_day string) error {
 
 func (f *appenderDaily) WriteLog(s string, _ string) (int, error) {
 	if !f.ready {
-		panic("daily not ready:" + s)
+		Error("daily log not ready:" + s)
+		return 0, nil
 	}
 	f.busing = true
 	re, err := f.file.WriteString(s)
@@ -61,6 +62,18 @@ func (f *appenderDaily) WriteLog(s string, _ string) (int, error) {
 }
 func (f *appenderDaily) Enable(level int) bool {
 	return f.level <= level
+}
+func (f *appenderDaily) Close() {
+	f.ready = false
+	if f.busing {
+		time.AfterFunc(time.Second*1, func() { f.Close() })
+		return
+	}
+	err := f.file.Close()
+	if err != nil {
+		Error("close daily log error:", err)
+		return
+	}
 }
 
 //每天重新设置日志文件

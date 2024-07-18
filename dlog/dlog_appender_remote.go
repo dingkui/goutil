@@ -25,6 +25,8 @@ func (f *remoteAppender) WriteLog(s string, logName string) (int, error) {
 	go f.postLog(logName, s)
 	return 0, nil
 }
+func (f *remoteAppender) Close() {
+}
 func errRemote(v1 interface{}, v ...interface{}) {
 	doRemoteErr.Stack(3, true, v1, v...)
 }
