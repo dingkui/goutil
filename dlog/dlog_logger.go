@@ -49,7 +49,7 @@ func log(data *_logInfo) {
 			}
 		}
 	} else {
-		os.Stdout.WriteString(info)
+		os.Stdout.WriteString(info + "\n")
 	}
 }
 
