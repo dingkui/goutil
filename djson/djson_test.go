@@ -253,3 +253,20 @@ func TestTypes(t *testing.T) {
 		dlog.Info("2")
 	}
 }
+func TestTypeB(t *testing.T) {
+	a1 := &TypeA{A: "a1", B: "b1"}
+	gojson := &TypeB{A1: a1}
+	gojson2 := &TypeB{}
+
+	x, err := djson.NewJsonGo(gojson)
+	dlog.Info(err)
+	dlog.Info(x)
+	bytes, _ := x.Byte()
+	dlog.Info(string(bytes))
+	x2, err := djson.NewJsonGo(bytes)
+	dlog.Info(err)
+	dlog.Info(x2)
+	x2.As(gojson2)
+	fmt.Println(gojson2)
+
+}

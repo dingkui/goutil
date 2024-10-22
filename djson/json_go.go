@@ -115,6 +115,9 @@ func (j *JsonGo) covert() error {
 		}
 		v := make(map[string]*JsonGo)
 		for key, value := range mapData {
+			if value == nil {
+				continue
+			}
 			jsonGo, err := NewJsonGo(value)
 			if err != nil {
 				return err
@@ -130,6 +133,9 @@ func (j *JsonGo) covert() error {
 		}
 		v := make([]*JsonGo, 0)
 		for _, value := range arrayData {
+			if value == nil {
+				continue
+			}
 			jsonGo, err := NewJsonGo(value)
 			if err != nil {
 				return err
