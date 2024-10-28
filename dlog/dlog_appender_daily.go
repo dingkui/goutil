@@ -78,7 +78,7 @@ func (f *appenderDaily) Close() {
 
 //每天重新设置日志文件
 func reInitAppendersDaily() {
-	_day := native.DateUtil.DayStr()
+	_day := native.DateUtil.Day.FormatNow()
 	for _, w := range _leveAppender {
 		f, ok := w.(*appenderDaily)
 		if ok {
@@ -105,7 +105,7 @@ func AddAppenderDaily(level int, filePath string) bool {
 		level:    level,
 	}
 
-	day := native.DateUtil.DayStr()
+	day := native.DateUtil.Day.FormatNow()
 	err := appenderDaily.init(day)
 	if err != nil {
 		Error("AddLogger failed!file is:"+filePath, day)

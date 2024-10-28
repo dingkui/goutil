@@ -50,7 +50,7 @@ func getType(level int) *logType {
 
 func (t logType) log(depth int, v1 interface{}, v ...interface{}) {
 	data := &_logInfo{
-		t: native.DateUtil.DateTimeStrM(),
+		t: native.DateUtil.DateTimeM.FormatNow(),
 		l: t.level,
 		f: native.RuntimeUtil.GetCaller(3 + depth),
 		m: native.StringUtil.Fmt(v1, v...),
