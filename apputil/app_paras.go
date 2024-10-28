@@ -2,6 +2,7 @@ package apputil
 
 import (
 	"os"
+	"strconv"
 	"strings"
 )
 
@@ -29,6 +30,28 @@ func GetPara(name string, def string) string {
 	v, has := paras[name]
 	if has {
 		return v
+	}
+	return def
+}
+func GetParaInt(name string, def int) int {
+	v, has := paras[name]
+	if has {
+		num, err := strconv.Atoi(v)
+		if err != nil {
+			return def
+		}
+		return num
+	}
+	return def
+}
+func GetParaInt64(name string, def int64) int64 {
+	v, has := paras[name]
+	if has {
+		num, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return def
+		}
+		return num
 	}
 	return def
 }
