@@ -4,10 +4,12 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"syscall"
 	"time"
@@ -45,6 +47,39 @@ func (x f) WriteAndSyncFile(filename string, data []byte, perm os.FileMode) erro
 	}
 	if err1 := f.Close(); err == nil {
 		err = err1
+	}
+	return err
+}
+func (x f) LL(root string, fn func(path string, info fs.FileInfo) error) error {
+	info, err := os.Lstat(root)
+	if err != nil {
+		return err
+	}
+	fn(root, info)
+	if !info.IsDir() {
+		return nil
+	}
+	f, err := os.Open(root)
+	if err != nil {
+		return err
+	}
+	names, err := f.Readdirnames(-1)
+	f.Close()
+	if err != nil {
+		return err
+	}
+	sort.Strings(names)
+
+	for _, name := range names {
+		filename := filepath.Join(root, name)
+		fileInfo, err := os.Lstat(filename)
+		if err != nil {
+			return err
+		}
+		err = fn(filename, fileInfo)
+		if err != nil {
+			return err
+		}
 	}
 	return err
 }
