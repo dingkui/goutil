@@ -20,7 +20,8 @@ var (
 	ErrTargetType = Err(2004, "ErrTargetType") //目标类型错误
 
 	ErrRemote      = Err(3000, "Remote")      //校验错误
-	ErrCredentials = Err(3001, "Credentials") //校验错误，登录凭据失效
+	ErrCredentials = Err(3401, "Credentials") //登录凭据失效
+	ErrForbidden   = Err(3403, "Forbidden")   //无访问权限
 	ErrHttp        = Err(3101, "Http")        //http调用时错误
 
 	ErrDb = Err(4000, "Db") //校验错误
