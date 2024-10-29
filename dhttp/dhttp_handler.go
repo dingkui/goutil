@@ -38,19 +38,25 @@ func (t *HttpHandler) handles() (iUrlHandler, iReqHandler, iResHandler) {
 	return t.url, t.req, t.res
 }
 
-type DefaultUrlHandler struct{ base string }
+type DefaultUrlHandler struct{ Base string }
 
 func (t *DefaultUrlHandler) GetUri(ops *Options) (*url.URL, error) {
 	path := ops.GetPath()
 	params := ops.GetUrlParams()
 	urlParams := GetURLParams(params)
-	base := t.base
-	if len(path) > 0 && base[len(base)-1:] == "/" {
-		base = base[:len(base)-1]
+	base := t.Base
+	isHttpPath := strings.Index(path, "http") == 0
+	if isHttpPath {
+		base = ""
+	} else {
+		if len(base) > 0 && base[len(base)-1:] == "/" {
+			base = base[:len(base)-1]
+		}
+		if len(path) == 0 || path[:1] != "/" {
+			path = "/" + path
+		}
 	}
-	if len(path) == 0 || path[:1] != "/" {
-		path = "/" + path
-	}
+
 	if urlParams != "" {
 		if strings.Index(path, "?") > -1 {
 			path += "&"
