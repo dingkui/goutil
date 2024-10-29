@@ -41,6 +41,9 @@ func (ops *Options) GetArg(key string) interface{} {
 }
 
 func (ops *Options) DataStream(data io.Reader) *Options {
+	if data == nil {
+		return ops
+	}
 	ops.AddArg(reqData, data)
 	ops.ContentType(ContentTypeStream)
 	return ops
@@ -76,6 +79,9 @@ func (ops *Options) DataFile(filePath string) *Options {
 	return ops
 }
 func (ops *Options) DataJson(json *djson.JsonGo) *Options {
+	if json == nil {
+		return ops
+	}
 	b, err := json.Byte()
 	if err != nil {
 		panic(err)
@@ -86,6 +92,9 @@ func (ops *Options) DataJson(json *djson.JsonGo) *Options {
 	return ops
 }
 func (ops *Options) DataFrom(json *djson.JsonGo) *Options {
+	if json == nil {
+		return ops
+	}
 	values := url.Values{}
 	m, err := json.Map()
 	if err != nil {
