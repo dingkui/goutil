@@ -13,7 +13,8 @@ import (
 const (
 	reqPath          = "req-path"
 	reqData          = "req-data"
-	reqHandler       = "req-handler"
+	httpHandler      = "http-handler"
+	readHandler      = "read-handler"
 	progressListener = "x-progress-listener"
 	responseHeader   = "x-response-header"
 )
@@ -39,7 +40,7 @@ func (ops *Options) GetArg(key string) interface{} {
 	return nil
 }
 
-func (ops *Options) DataStram(data io.Reader) *Options {
+func (ops *Options) DataStream(data io.Reader) *Options {
 	ops.AddArg(reqData, data)
 	ops.ContentType(ContentTypeStream)
 	return ops
@@ -129,15 +130,27 @@ func (ops *Options) GetPath() string {
 	}
 	return ""
 }
-func (ops *Options) ReqHandler(data IReqHandler) {
-	ops.AddArg(reqHandler, data)
+func (ops *Options) HttpHandler(data *HttpHandler) *Options {
+	ops.AddArg(httpHandler, data)
+	return ops
 }
-func (ops *Options) GetReqHandler() IReqHandler {
-	value := ops.GetArg(reqHandler)
+func (ops *Options) GetHttpHandler() *HttpHandler {
+	value := ops.GetArg(httpHandler)
 	if value != nil {
-		return value.(IReqHandler)
+		return value.(*HttpHandler)
 	}
-	panic("no request handler found")
+	panic("no Http Handler found")
+}
+func (ops *Options) ReadHandler(data iReadHandler) *Options {
+	ops.AddArg(readHandler, data)
+	return ops
+}
+func (ops *Options) GetReadHandler() iReadHandler {
+	value := ops.GetArg(readHandler)
+	if value != nil {
+		return value.(iReadHandler)
+	}
+	return nil
 }
 
 func (ops *Options) ResponseHeader(respHeader *http.Header) {

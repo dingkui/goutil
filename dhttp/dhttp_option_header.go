@@ -68,7 +68,7 @@ func (ops *Options) GetHeaders() map[string]string {
 			headers[option.key] = option.value.(string)
 		}
 	}
-	return nil
+	return headers
 }
 func (ops *Options) GetHeader(key string) string {
 	for _, option := range ops.options {

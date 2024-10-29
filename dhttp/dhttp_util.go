@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"gitee.com/dk83/goutils/djson"
 	"io"
+	"io/ioutil"
+	"net/http"
 	"net/url"
 	"os"
 	"sort"
@@ -56,4 +58,12 @@ func GetReaderLen(reader io.Reader) (int64, error) {
 		err = fmt.Errorf("can't get reader content length,unkown reader type")
 	}
 	return contentLength, err
+}
+func ReadResponseBody(resp *http.Response) ([]byte, error) {
+	defer resp.Body.Close()
+	out, err := ioutil.ReadAll(resp.Body)
+	if err == io.EOF {
+		err = nil
+	}
+	return out, err
 }

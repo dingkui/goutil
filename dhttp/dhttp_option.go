@@ -38,10 +38,6 @@ func (ops *Options) find(key string, op optionType) *Option {
 	return nil
 }
 
-func (ops *Options) isOptionSet(key string, op optionType) (bool, interface{}, error) {
-	return ops.find(key, op) != nil, nil, nil
-}
-
 func (ops *Options) deleteOption(strKey string, op optionType) {
 	var outOption []*Option
 	for _, option := range ops.options {

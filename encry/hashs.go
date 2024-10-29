@@ -5,6 +5,9 @@ import (
 	"bytes"
 	"crypto/hmac"
 	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
+	"crypto/sha512"
 	"fmt"
 	"gitee.com/dk83/goutils/dlog"
 	"hash"
@@ -22,11 +25,11 @@ type crypto struct {
 }
 
 var (
-	Md5 = NewCrypto(md5.New, nil)
-	//Sha1    = NewCrypto(sha1.New, nil)
-	//Sha256  = NewCrypto(sha256.New, nil)
-	//Sha512  = NewCrypto(sha512.New, nil)
-	//HSha512 = NewCrypto(sha512.New, demoKey)
+	Md5     = NewCrypto(md5.New, nil)
+	Sha1    = NewCrypto(sha1.New, nil)
+	Sha256  = NewCrypto(sha256.New, nil)
+	Sha512  = NewCrypto(sha512.New, nil)
+	HSha512 = NewCrypto(sha512.New, demoKey)
 )
 
 func NewCrypto(newHash func() hash.Hash, key []byte) crypto {

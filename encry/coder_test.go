@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var data = []byte("在这个例子中，我们首先使用 time.Now().Nanosecond() 获取当前时间的纳秒级时间戳")
+var data = []byte("local")
 
 func TestHashs(t *testing.T) {
 	bytes, err := encry.Md5.SumBytes(data)
