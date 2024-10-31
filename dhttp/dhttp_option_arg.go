@@ -82,7 +82,7 @@ func (ops *Options) DataJson(json *djson.JsonGo) *Options {
 	if json == nil {
 		return ops
 	}
-	b, err := json.Byte()
+	b, err := json.Bytes()
 	if err != nil {
 		panic(err)
 	}

@@ -4,6 +4,7 @@ import (
 	"gitee.com/dk83/goutils/djson"
 	"gitee.com/dk83/goutils/dlog"
 	"gitee.com/dk83/goutils/errs"
+	"gitee.com/dk83/goutils/utils/valUtil"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -143,7 +144,7 @@ func (ops HTTPMethod) DoReq(uri *url.URL, headers map[string]string, body io.Rea
 
 	contentLength, ok := headers[HTTPHeaderContentLength]
 	if listener != nil && body != nil && ok {
-		teeData, progress := newTeeReader(body, nil, listener, djson.IntN(0, contentLength))
+		teeData, progress := newTeeReader(body, nil, listener, valUtil.Int64N(contentLength))
 		body = teeData
 		// Transfer started
 		progress.reqStarted()

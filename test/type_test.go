@@ -2,8 +2,19 @@ package test
 
 import (
 	"fmt"
+	"gitee.com/dk83/goutils/apputil"
+	"gitee.com/dk83/goutils/dhttp"
+	"gitee.com/dk83/goutils/djson"
 	"gitee.com/dk83/goutils/dlog"
+	"gitee.com/dk83/goutils/encry"
 	"gitee.com/dk83/goutils/errs"
+	"gitee.com/dk83/goutils/utils/dateUtil"
+	"gitee.com/dk83/goutils/utils/fileUtil"
+	"gitee.com/dk83/goutils/utils/idUtil"
+	"gitee.com/dk83/goutils/utils/mathUtil"
+	"gitee.com/dk83/goutils/utils/runtimeUtil"
+	"gitee.com/dk83/goutils/utils/stringUtil"
+	"gitee.com/dk83/goutils/utils/valUtil"
 	"reflect"
 	"testing"
 )
@@ -96,11 +107,11 @@ func TestArray(t *testing.T) {
 }
 
 var (
-	errUnReached  = errs.Err(9001, "xx") //不应该到达的错误
-	errValid      = errs.Err(9002, "xx") //校验错误
-	errJsonType   = errs.Err(9003, "xx") //json数据类型错误
-	errTarget     = errs.Err(9004, "xx") //目标错误
-	errTargetType = errs.Err(9005, "xx") //目标类型错误
+	errUnReached  = errs.Err(19001, "xx") //不应该到达的错误
+	errValid      = errs.Err(19002, "xx") //校验错误
+	errJsonType   = errs.Err(19003, "xx") //json数据类型错误
+	errTarget     = errs.Err(19004, "xx") //目标错误
+	errTargetType = errs.Err(19005, "xx") //目标类型错误
 )
 
 func TestErr(t *testing.T) {
@@ -120,4 +131,19 @@ func TestErr(t *testing.T) {
 	dlog.Info(errs.ErrSystem.Msg(err2))
 	dlog.Info(err1)
 	dlog.Info(err2)
+}
+
+func TestAll(t *testing.T) {
+	dlog.Info(apputil.GetPara("xx", "1"))
+	dlog.Info(dhttp.Client{})
+	dlog.Info(djson.NewJsonMap())
+	dlog.Info(encry.Md5)
+	dlog.Info(errs.ErrSystem.New("ErrSystem"))
+	dlog.Info(dateUtil.DateTime.FormatNow())
+	dlog.Info(fileUtil.Exists("d:/"))
+	dlog.Info(idUtil.ID16(32))
+	dlog.Info(mathUtil.Round(12.1, 3))
+	dlog.Info(runtimeUtil.GetCaller(1))
+	dlog.Info(stringUtil.Fmt("%d", 1))
+	dlog.Info(valUtil.Str(1))
 }

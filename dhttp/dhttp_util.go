@@ -3,7 +3,7 @@ package dhttp
 import (
 	"bytes"
 	"fmt"
-	"gitee.com/dk83/goutils/djson"
+	"gitee.com/dk83/goutils/utils/valUtil"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,7 +29,7 @@ func GetURLParams(params map[string]interface{}) string {
 		}
 		buf.WriteString(url.QueryEscape(k))
 		if params[k] != nil {
-			s := djson.StrN("", params[k])
+			s := valUtil.StrN(params[k])
 			buf.WriteString("=" + strings.Replace(url.QueryEscape(s), "+", "%20", -1))
 		}
 	}

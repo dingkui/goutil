@@ -6,6 +6,7 @@ import (
 	"gitee.com/dk83/goutils/dhttp"
 	"gitee.com/dk83/goutils/djson"
 	"gitee.com/dk83/goutils/dlog"
+	"gitee.com/dk83/goutils/utils/valUtil"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -85,7 +86,7 @@ func TestClient1(t *testing.T) {
 		return
 	}
 	json, i, err := res.HandleResAsStr()
-	dlog.Info(djson.StrN("", json), i, err)
+	dlog.Info(valUtil.StrN(json), i, err)
 }
 func TestClient2(t *testing.T) {
 	jsonGo, _ := djson.NewJsonGo(make(map[string]interface{}))
@@ -93,7 +94,7 @@ func TestClient2(t *testing.T) {
 	jsonGo.Set("1234", "pass")
 	form, err := client.SendJson("POST", "/api/ma/auth", jsonGo)
 	dlog.Info(err)
-	dlog.Info(djson.StrN("", form))
+	dlog.Info(valUtil.StrN(form))
 }
 
 func TestHttp(t *testing.T) {

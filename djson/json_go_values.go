@@ -126,7 +126,7 @@ func (j *JsonGo) Int64(def int64, keys ...interface{}) (int64, error) {
 	}
 	return valUtil.Int64(native, def)
 }
-func (j *JsonGo) IntN64(def int64, keys ...interface{}) int64 {
+func (j *JsonGo) Int64N(def int64, keys ...interface{}) int64 {
 	t, err := j.Int64(def, keys...)
 	if err != nil {
 		dlog.Warn(err)
