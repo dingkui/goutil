@@ -1,4 +1,4 @@
-package native
+package fileUtil
 
 import (
 	"fmt"
@@ -56,7 +56,7 @@ func _shorten_file_name_root(file_name_root string, max_length int) string {
 func (self *FileNameSet) Unique_file_name(file_name string) string {
 	file_name = strings.ReplaceAll(file_name, " ", "")
 	file_name = strings.ReplaceAll(file_name, "#", "")
-	root, ext := FileUtil.Splitext(file_name)
+	root, ext := Splitext(file_name)
 	lower_root := strings.ToLower(root)
 	last_suffix, has := self.root_last_suffix[lower_root]
 	if has {

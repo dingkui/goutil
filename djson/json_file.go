@@ -3,7 +3,7 @@ package djson
 import (
 	"gitee.com/dk83/goutils/dlog"
 	"gitee.com/dk83/goutils/errs"
-	"gitee.com/dk83/goutils/native"
+	"gitee.com/dk83/goutils/utils/fileUtil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -58,14 +58,14 @@ func (j *JsonFile) save(format bool) bool {
 		panic(errs.ErrSystem.New("JsonFile is not Read completed!"))
 		return false
 	}
-	bytes, err := j.Byte()
+	bytes, err := j.Bytes()
 	if err != nil {
 		dlog.Error(err, j._file)
 		panic(err)
 		return false
 	}
 	os.MkdirAll(filepath.Dir(j._file), os.ModePerm)
-	native.FileUtil.WriteAndSyncFile(j._file, formatJson(bytes, format), os.ModePerm)
+	fileUtil.WriteAndSyncFile(j._file, formatJson(bytes, format), os.ModePerm)
 	return true
 }
 func (j *JsonFile) SaveFormat() bool {

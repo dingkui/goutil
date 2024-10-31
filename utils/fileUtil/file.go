@@ -1,4 +1,4 @@
-package native
+package fileUtil
 
 import (
 	"errors"
@@ -15,12 +15,8 @@ import (
 	"time"
 )
 
-type f byte
-
-const FileUtil f = iota
-
 //获取文件修改时间 返回unix时间戳
-func (x f) GetFileModTime(path string) (time.Time, error) {
+func GetFileModTime(path string) (time.Time, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return time.Now(), err
@@ -33,7 +29,7 @@ func (x f) GetFileModTime(path string) (time.Time, error) {
 	return fi.ModTime(), nil
 }
 
-func (x f) WriteAndSyncFile(filename string, data []byte, perm os.FileMode) error {
+func WriteAndSyncFile(filename string, data []byte, perm os.FileMode) error {
 	f, err := os.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
 	if err != nil {
 		return err
@@ -50,7 +46,7 @@ func (x f) WriteAndSyncFile(filename string, data []byte, perm os.FileMode) erro
 	}
 	return err
 }
-func (x f) LL(root string, fn func(path string, info fs.FileInfo) error) error {
+func LL(root string, fn func(path string, info fs.FileInfo) error) error {
 	info, err := os.Lstat(root)
 	if err != nil {
 		return err
@@ -84,12 +80,12 @@ func (x f) LL(root string, fn func(path string, info fs.FileInfo) error) error {
 	return err
 }
 
-func (x f) Exists(path string) bool {
+func Exists(path string) bool {
 	_, err := os.Stat(path)
 	return !os.IsNotExist(err)
 }
 
-func (x f) IsFile(path string) bool {
+func IsFile(path string) bool {
 	info, err := os.Stat(path)
 	if err != nil {
 		return false
@@ -98,7 +94,7 @@ func (x f) IsFile(path string) bool {
 	return !info.IsDir()
 }
 
-func (x f) MakeUnique(file_path string) string {
+func MakeUnique(file_path string) string {
 	idx := 2
 	root := filepath.Dir(file_path)
 	ext := filepath.Ext(file_path)
@@ -106,7 +102,7 @@ func (x f) MakeUnique(file_path string) string {
 	root = filepath.Join(root, strings.TrimSuffix(filename, ext))
 	//root += strings.TrimSuffix(filename,ext)
 
-	for x.Exists(file_path) {
+	for Exists(file_path) {
 		file_path = fmt.Sprintf("%s-%d%s", root, idx, ext)
 		idx += 1
 	}
@@ -114,13 +110,13 @@ func (x f) MakeUnique(file_path string) string {
 	return file_path
 }
 
-func (x f) Splitext(file_path string) (name string, ext string) {
+func Splitext(file_path string) (name string, ext string) {
 	ext = filepath.Ext(file_path)
 	name = strings.TrimSuffix(file_path, ext)
 	return name, ext
 }
 
-func (x f) CopyFile(src, dest string) error {
+func CopyFile(src, dest string) error {
 	if dest == src {
 		return nil
 	}
@@ -147,7 +143,7 @@ func (x f) CopyFile(src, dest string) error {
  * @param srcPath  		需要拷贝的文件夹路径: D:/test
  * @param destPath		拷贝到的位置: D:/backup/
  */
-func (x f) CopyDir(srcPath string, destPath string) error {
+func CopyDir(srcPath string, destPath string) error {
 	//检测目录正确性
 	if srcInfo, err := os.Stat(srcPath); err != nil {
 		return err
@@ -173,7 +169,7 @@ func (x f) CopyDir(srcPath string, destPath string) error {
 			path := strings.Replace(path, "/", "\\", -1)
 			destNewPath := strings.Replace(path, srcPath, destPath, -1)
 			//zlog.Debug("复制文件:" + path + " 到 " + destNewPath)
-			x.CopyFile(path, destNewPath)
+			CopyFile(path, destNewPath)
 		}
 		return nil
 	})
@@ -184,7 +180,7 @@ func (x f) CopyDir(srcPath string, destPath string) error {
 }
 
 //检测文件夹路径时候存在
-func (x f) PathExists(path string) (bool, error) {
+func PathExists(path string) (bool, error) {
 	_, err := os.Stat(path)
 	if err == nil {
 		return true, nil
@@ -195,15 +191,15 @@ func (x f) PathExists(path string) (bool, error) {
 	return false, err
 }
 
-func (x f) RenameFile(oldFile, newFile string) error {
-	if x.Exists(oldFile) {
+func RenameFile(oldFile, newFile string) error {
+	if Exists(oldFile) {
 		err := os.Rename(oldFile, newFile)
 		return err
 	}
 	return nil
 }
 
-func (x f) Read(path string) ([]byte, error) {
+func Read(path string) ([]byte, error) {
 	by, e := ioutil.ReadFile(path)
 	if e != nil {
 		return nil, e
@@ -211,7 +207,7 @@ func (x f) Read(path string) ([]byte, error) {
 	return by, nil
 }
 
-func (x f) GetFileCreateTime(path string) int64 {
+func GetFileCreateTime(path string) int64 {
 	osType := runtime.GOOS
 	fileInfo, _ := os.Stat(path)
 	if osType == "windows" {

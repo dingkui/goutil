@@ -1,35 +1,27 @@
-package native
+package dateUtil
 
 import (
 	"time"
 )
 
 type dateLayout string
-type dateUtil struct {
-	DateTimeM dateLayout
-	DateTime  dateLayout
-	DateTime2 dateLayout
-	Minute    dateLayout
-	Hour      dateLayout
-	Day       dateLayout
-}
 
-var DateUtil = dateUtil{
-	DateTimeM: "2006/01/02 15:04:05.000",
-	DateTime:  "2006/01/02 15:04:05",
-	DateTime2: "20060102_150405",
-	Minute:    "20060102_1504",
-	Hour:      "20060102_15",
-	Day:       "20060102",
-}
+var (
+	DateTimeM dateLayout = "2006/01/02 15:04:05.000"
+	DateTime  dateLayout = "2006/01/02 15:04:05"
+	DateTime2 dateLayout = "20060102_150405"
+	Minute    dateLayout = "20060102_1504"
+	Hour      dateLayout = "20060102_15"
+	Day       dateLayout = "20060102"
+)
 
-func (t dateUtil) Layout(layout string) dateLayout {
+func Layout(layout string) dateLayout {
 	return dateLayout(layout)
 }
-func (t dateUtil) Now() time.Time {
+func Now() time.Time {
 	return time.Now()
 }
-func (t dateUtil) Unix(ti int64) time.Time {
+func Unix(ti int64) time.Time {
 	return time.Unix(ti, 0)
 }
 

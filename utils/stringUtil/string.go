@@ -1,15 +1,11 @@
-package native
+package stringUtil
 
 import (
 	"fmt"
 	"strings"
 )
 
-type s byte
-
-const StringUtil s = iota
-
-func (x s) Fmt(s interface{}, v ...interface{}) string {
+func Fmt(s interface{}, v ...interface{}) string {
 	if len(v) == 0 {
 		return fmt.Sprint(s)
 	}
@@ -20,7 +16,7 @@ func (x s) Fmt(s interface{}, v ...interface{}) string {
 	return fmt.Sprintf(message, v...)
 }
 
-func (x s) InStringArray(list []string, find string) bool {
+func InStringArray(list []string, find string) bool {
 	if list == nil || len(list) == 0 {
 		return false
 	}

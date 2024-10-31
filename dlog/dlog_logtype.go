@@ -2,7 +2,9 @@ package dlog
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/native"
+	"gitee.com/dk83/goutils/utils/dateUtil"
+	"gitee.com/dk83/goutils/utils/runtimeUtil"
+	"gitee.com/dk83/goutils/utils/stringUtil"
 	"runtime/debug"
 	"strings"
 )
@@ -35,7 +37,7 @@ func AddType(level int, name string, sync bool) *logType {
 		level: level,
 		name:  name,
 		sync:  sync,
-		addr:  native.RuntimeUtil.GetCaller(2),
+		addr:  runtimeUtil.GetCaller(2),
 	}
 	_logTypes[level] = e
 	return e
@@ -50,10 +52,10 @@ func getType(level int) *logType {
 
 func (t logType) log(depth int, v1 interface{}, v ...interface{}) {
 	data := &_logInfo{
-		t: native.DateUtil.DateTimeM.FormatNow(),
+		t: dateUtil.DateTimeM.FormatNow(),
 		l: t.level,
-		f: native.RuntimeUtil.GetCaller(3 + depth),
-		m: native.StringUtil.Fmt(v1, v...),
+		f: runtimeUtil.GetCaller(3 + depth),
+		m: stringUtil.Fmt(v1, v...),
 	}
 	if t.sync {
 		log(data)
@@ -73,7 +75,7 @@ func (t logType) LogLocal(v1 interface{}, v ...interface{}) {
 }
 func (t logType) Stack(calldepth int, isShort bool, v1 interface{}, v ...interface{}) {
 	stack := getStack(string(debug.Stack()), 7, calldepth, isShort)
-	msg := native.StringUtil.Fmt(v1, v...)
+	msg := stringUtil.Fmt(v1, v...)
 	t.log(1, "%s stacks:\n%s", msg, stack)
 }
 

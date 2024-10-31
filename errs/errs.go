@@ -2,7 +2,8 @@ package errs
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/native"
+	"gitee.com/dk83/goutils/utils/runtimeUtil"
+	"gitee.com/dk83/goutils/utils/stringUtil"
 )
 
 //## 错误类型
@@ -37,7 +38,7 @@ func Err(code int, msg string) *ErrType {
 	e := &ErrType{
 		code: code,
 		msg:  msg,
-		addr: native.RuntimeUtil.GetCaller(2),
+		addr: runtimeUtil.GetCaller(2),
 	}
 	_errs[code] = e
 	return e
@@ -55,20 +56,20 @@ func (e *ErrType) New(msg interface{}, a ...interface{}) error {
 func (e *ErrType) NewWithData(d interface{}, msg interface{}, a ...interface{}) error {
 	err := &errInfo{
 		t: e,
-		a: native.RuntimeUtil.GetCaller(2),
+		a: runtimeUtil.GetCaller(2),
 		d: d,
 	}
 
 	_e, ok := msg.(*Error)
 	if ok {
 		if len(a) > 0 {
-			err.m = native.StringUtil.Fmt(a[0], a[1:]...)
+			err.m = stringUtil.Fmt(a[0], a[1:]...)
 		} else {
 			err.m = e.msg
 		}
 		return &Error{trace: append([]*errInfo{err}, _e.trace...)}
 	} else {
-		err.m = native.StringUtil.Fmt(msg, a...)
+		err.m = stringUtil.Fmt(msg, a...)
 		return &Error{trace: []*errInfo{err}}
 	}
 }

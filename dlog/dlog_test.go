@@ -3,7 +3,7 @@ package dlog_test
 import (
 	"fmt"
 	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/native"
+	"gitee.com/dk83/goutils/utils/runtimeUtil"
 	"testing"
 	"time"
 )
@@ -16,9 +16,9 @@ func init() {
 }
 
 func TestGetCaller(t *testing.T) {
-	fmt.Println(native.RuntimeUtil.GetCaller(0))
-	fmt.Println(native.RuntimeUtil.GetCaller(1))
-	fmt.Println(native.RuntimeUtil.GetCaller(2))
+	fmt.Println(runtimeUtil.GetCaller(0))
+	fmt.Println(runtimeUtil.GetCaller(1))
+	fmt.Println(runtimeUtil.GetCaller(2))
 }
 func TestLog(t *testing.T) {
 	//dlog.Debug("113: %s", "Debug")

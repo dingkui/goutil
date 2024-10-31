@@ -1,9 +1,9 @@
-package native_test
+package dateUtil_test
 
 import (
 	"fmt"
 	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/native"
+	"gitee.com/dk83/goutils/utils/dateUtil"
 	"testing"
 	"time"
 )
@@ -18,6 +18,6 @@ func TestTime(t *testing.T) {
 	dlog.Info("TestTime2:", fmt.Sprintf("%x", second1))
 }
 func TestTime1(t *testing.T) {
-	dlog.Info("FormatNow:", native.DateUtil.Day.FormatNow())
-	dlog.Info("FormatNow:", native.DateUtil.DateTimeM.FormatNow())
+	dlog.Info("FormatNow:", dateUtil.Day.FormatNow())
+	dlog.Info("FormatNow:", dateUtil.DateTimeM.FormatNow())
 }

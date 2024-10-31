@@ -66,6 +66,3 @@ func checkKeys(keys ...interface{}) error {
 	}
 	return nil
 }
-func getInt(str string) (int, error) {
-	return strconv.Atoi(str)
-}

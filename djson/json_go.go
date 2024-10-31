@@ -94,7 +94,7 @@ func mkJsonGoByBytes(bytes []byte, re *JsonGo) error {
 	return errs.ErrValidate.New("mkJsonGoByBytes success but result is not a Map or Array")
 }
 func (j *JsonGo) As(re interface{}, keys ...interface{}) (err error) {
-	bytes, err := j.Byte(keys...)
+	bytes, err := j.Bytes(keys...)
 	if err != nil {
 		return err
 	}

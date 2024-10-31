@@ -1,6 +1,9 @@
 package djson
 
-import "gitee.com/dk83/goutils/dlog"
+import (
+	"gitee.com/dk83/goutils/dlog"
+	"gitee.com/dk83/goutils/utils/valUtil"
+)
 
 // Native 获取原生数据
 func (j *JsonGo) Native(keys ...interface{}) (interface{}, error) {
@@ -86,12 +89,12 @@ func (j *JsonGo) Map(keys ...interface{}) (map[string]*JsonGo, error) {
 	}
 	return t.mapData()
 }
-func (j *JsonGo) Byte(keys ...interface{}) ([]byte, error) {
+func (j *JsonGo) Bytes(keys ...interface{}) ([]byte, error) {
 	native, err := j.Native(keys...)
 	if err != nil {
 		return nil, err
 	}
-	return Byte(native)
+	return valUtil.Bytes(native)
 }
 
 func (j *JsonGo) Str(def string, keys ...interface{}) (string, error) {
@@ -103,7 +106,7 @@ func (j *JsonGo) Str(def string, keys ...interface{}) (string, error) {
 	if err != nil {
 		return def, err
 	}
-	return Str(def, native)
+	return valUtil.Str(native, def)
 }
 func (j *JsonGo) StrN(def string, keys ...interface{}) string {
 	t, err := j.Str(def, keys...)
@@ -112,7 +115,7 @@ func (j *JsonGo) StrN(def string, keys ...interface{}) string {
 	}
 	return t
 }
-func (j *JsonGo) Int(def int64, keys ...interface{}) (int64, error) {
+func (j *JsonGo) Int64(def int64, keys ...interface{}) (int64, error) {
 	t, err := j.Get(keys...)
 	if err != nil {
 		return def, err
@@ -121,24 +124,38 @@ func (j *JsonGo) Int(def int64, keys ...interface{}) (int64, error) {
 	if err != nil {
 		return def, err
 	}
-	return Int(def, native)
+	return valUtil.Int64(native, def)
 }
-func (j *JsonGo) IntN(def int64, keys ...interface{}) int64 {
+func (j *JsonGo) IntN64(def int64, keys ...interface{}) int64 {
+	t, err := j.Int64(def, keys...)
+	if err != nil {
+		dlog.Warn(err)
+	}
+	return t
+}
+func (j *JsonGo) Int(def int, keys ...interface{}) (int, error) {
+	native, err := j.Native(keys...)
+	if err != nil {
+		return def, err
+	}
+	return valUtil.Int(native, def)
+}
+func (j *JsonGo) IntN(def int, keys ...interface{}) int {
 	t, err := j.Int(def, keys...)
 	if err != nil {
 		dlog.Warn(err)
 	}
 	return t
 }
-func (j *JsonGo) Float(def float64, keys ...interface{}) (float64, error) {
+func (j *JsonGo) Float64(def float64, keys ...interface{}) (float64, error) {
 	native, err := j.Native(keys...)
 	if err != nil {
 		return def, err
 	}
-	return Float(def, native)
+	return valUtil.Float64(native, def)
 }
-func (j *JsonGo) FloatN(def float64, keys ...interface{}) float64 {
-	t, err := j.Float(def, keys...)
+func (j *JsonGo) Float64N(def float64, keys ...interface{}) float64 {
+	t, err := j.Float64(def, keys...)
 	if err != nil {
 		dlog.Warn(err)
 	}
@@ -149,7 +166,7 @@ func (j *JsonGo) Bool(def bool, keys ...interface{}) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return Bool(def, native)
+	return valUtil.Bool(native, def)
 }
 
 func (j *JsonGo) BoolN(def bool, keys ...interface{}) bool {
@@ -158,4 +175,23 @@ func (j *JsonGo) BoolN(def bool, keys ...interface{}) bool {
 		dlog.Warn(err)
 	}
 	return t
+}
+
+func (j *JsonGo) ToStr() (string, error) {
+	return j.Str(valUtil.Emputy_str)
+}
+func (j *JsonGo) ToInt64() (int64, error) {
+	return j.Int64(valUtil.Emputy_int64)
+}
+func (j *JsonGo) ToInt() (int, error) {
+	return j.Int(valUtil.Emputy_int)
+}
+func (j *JsonGo) ToBool() (bool, error) {
+	return j.Bool(valUtil.Emputy_bool)
+}
+func (j *JsonGo) ToBytes() ([]byte, error) {
+	return j.Bytes()
+}
+func (j *JsonGo) ToFloat64() (float64, error) {
+	return j.Float64(valUtil.Emputy_float64)
 }

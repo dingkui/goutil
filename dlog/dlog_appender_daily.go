@@ -2,7 +2,7 @@ package dlog
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/native"
+	"gitee.com/dk83/goutils/utils/dateUtil"
 	"os"
 	"path/filepath"
 	"time"
@@ -78,7 +78,7 @@ func (f *appenderDaily) Close() {
 
 //每天重新设置日志文件
 func reInitAppendersDaily() {
-	_day := native.DateUtil.Day.FormatNow()
+	_day := dateUtil.Day.FormatNow()
 	for _, w := range _leveAppender {
 		f, ok := w.(*appenderDaily)
 		if ok {
@@ -105,7 +105,7 @@ func AddAppenderDaily(level int, filePath string) bool {
 		level:    level,
 	}
 
-	day := native.DateUtil.Day.FormatNow()
+	day := dateUtil.Day.FormatNow()
 	err := appenderDaily.init(day)
 	if err != nil {
 		Error("AddLogger failed!file is:"+filePath, day)
