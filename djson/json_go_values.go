@@ -195,3 +195,13 @@ func (j *JsonGo) ToBytes() ([]byte, error) {
 func (j *JsonGo) ToFloat64() (float64, error) {
 	return j.Float64(valUtil.Emputy_float64)
 }
+
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (j *JsonGo) UnmarshalJSON(data []byte) error {
+	return j.ReNew(data)
+}
+
+// MarshalJSON implements the json.Marshaler interface.
+func (j *JsonGo) MarshalJSON() ([]byte, error) {
+	return j.ToBytes()
+}

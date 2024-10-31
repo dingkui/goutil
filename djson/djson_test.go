@@ -272,3 +272,43 @@ func TestTypeB(t *testing.T) {
 	fmt.Println(gojson2)
 
 }
+func TestMars(t *testing.T) {
+	jsonGo := djson.NewJsonMap()
+	jsonGo.Set("xxValue", "@xx.xx")
+
+	dlog.Info(jsonGo)
+	marshal, _ := json.Marshal(jsonGo)
+	dlog.Info(string(marshal))
+	dlog.Info(jsonGo)
+	json.Unmarshal(marshal, jsonGo)
+	dlog.Info(jsonGo)
+}
+
+func TestJsonArray9(t *testing.T) {
+	jsonGo, _ := djson.NewJsonArray()
+	jsonGo.Set("xxValue", -1)
+	jsonGo.Set("xxValue2", -1)
+	jsonGo.Set("xxValue3", -1)
+
+	dlog.Info(jsonGo)
+	marshal, _ := json.Marshal(jsonGo)
+	dlog.Info(string(marshal))
+	dlog.Info(jsonGo)
+	json.Unmarshal(marshal, jsonGo)
+	dlog.Info(jsonGo)
+	jsonGo.Set("xxValue22", "@xx.xx")
+	dlog.Info(jsonGo.ToStr())
+}
+func TestJson9(t *testing.T) {
+	jsonGo, _ := djson.NewJsonFile("", make([]string, 0))
+	jsonGo.Set("xxValue", "@1")
+
+	dlog.Info(jsonGo)
+	marshal, _ := json.Marshal(jsonGo)
+	dlog.Info(string(marshal))
+	dlog.Info(jsonGo)
+	json.Unmarshal(marshal, jsonGo)
+	dlog.Info(jsonGo)
+	jsonGo.Set("xxValue22", "@xx.xx")
+	dlog.Info(jsonGo.ToStr())
+}
