@@ -104,7 +104,7 @@ var (
 )
 
 func TestErr(t *testing.T) {
-	defer errs.Recover()
+	defer dlog.Recover()
 	//errs.Err(9001, "xx232")    //不应该到达的错误
 
 	err1 := errUnReached.New("errUnReached")

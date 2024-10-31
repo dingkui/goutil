@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -46,7 +45,7 @@ func WriteAndSyncFile(filename string, data []byte, perm os.FileMode) error {
 	}
 	return err
 }
-func LL(root string, fn func(path string, info fs.FileInfo) error) error {
+func LL(root string, fn func(path string, info os.FileInfo) error) error {
 	info, err := os.Lstat(root)
 	if err != nil {
 		return err

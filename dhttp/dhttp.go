@@ -93,7 +93,7 @@ func (ops HTTPMethod) Do(options *Options) (*Response, error) {
 	if listener != nil && resp.ContentLength > 1024*1024 {
 		// CRC
 		resBody, reProgress := newTeeReader(resp.Body, nil, listener, resp.ContentLength)
-		resp.Body = io.NopCloser(resBody)
+		resp.Body = ioutil.NopCloser(resBody)
 		reProgress.resStarted()
 		defer func() {
 			reProgress.resEnd()
@@ -101,7 +101,7 @@ func (ops HTTPMethod) Do(options *Options) (*Response, error) {
 		}()
 	} else {
 		resBody := resp.Body
-		resp.Body = io.NopCloser(resBody)
+		resp.Body = ioutil.NopCloser(resBody)
 		defer func() {
 			resBody.Close()
 		}()
