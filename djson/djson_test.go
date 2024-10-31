@@ -67,9 +67,9 @@ func TestJsonGo1(t *testing.T) {
 	jsonInt1, _ := djson.NewJsonGo(123.1)
 	check(t, "jsonStr1.Str:%s", jsonStr1, "aaa")
 	check(t, "jsonStr2.Str:%s", jsonFloat1, "1.1")
-	check(t, "jsonInt1.Str:%s", jsonInt1, "123")
+	check(t, "jsonInt1.Str:%s", jsonInt1, "123.1")
 	check(t, "jsonFloat1.IntN:%s", jsonFloat1.IntN(2), "2")
-	check(t, "jsonInt1.FloatN:%s", jsonInt1.Float64N(1), "123")
+	check(t, "jsonInt1.FloatN:%s", jsonInt1.Float64N(1), "123.1")
 }
 
 // TestJsonGo2 As 测试
@@ -149,25 +149,27 @@ func TestRemove(t *testing.T) {
 	jsonB1, _ := djson.NewJsonGo(input)
 	check(t, "jsonB1:%s", jsonB1, input)
 	dlog.Info("------------------------Set to last------------------------------")
-	jsonB1.Set(1, "@A4.-1")
-	jsonB1.Set(2, "@A4.-1")
-	jsonB1.Set(3, "@A4.-1")
+	jsonB1.Set(1, "@A4.-2")
+	jsonB1.Set(2, "@A4.-2")
+	jsonB1.Set(3, "@A4.-2")
 	strSet2 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[1,2,3]}`
 	check(t, "jsonB1:%s", jsonB1, strSet2)
 	dlog.Info("------------------------remove------------------------------")
-	jsonB1.Remove("@A4.-1")
+	jsonB1.Remove("@A4.-2")
 	strRemove1 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[1,2]}`
 	check(t, "jsonB1:%s", jsonB1, strRemove1)
 	jsonB1.Remove("@A4")
 	check(t, "jsonB1:%s", jsonB1, input)
-	dlog.Info("------------------------Set to last------------------------------")
+	dlog.Info("------------------------Set to first------------------------------")
 	jsonB1.Set(1, "A4", "-1")
 	jsonB1.Set(2, "A4", "-1")
 	jsonB1.Set(3, "A4", "-1")
-	check(t, "jsonB1:%s", jsonB1, strSet2)
+	strfirst1 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[3,2,1]}`
+	check(t, "jsonB1:%s", jsonB1, strfirst1)
 	dlog.Info("------------------------remove------------------------------")
 	jsonB1.Remove("@A4.-1")
-	check(t, "jsonB1:%s", jsonB1, strRemove1)
+	strfirst2 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[2,1]}`
+	check(t, "jsonB1:%s", jsonB1, strfirst2)
 	jsonB1.Remove("@A4")
 	check(t, "jsonB1:%s", jsonB1, input)
 }
@@ -189,16 +191,16 @@ func TestNewJsonFile(t *testing.T) {
 	file.ReLoad()
 	check(t, "file:%s", file, input)
 	check(t, "jsonB1:%s", jsonB1, input)
-	dlog.Info("------------------------Set to last------------------------------")
+	dlog.Info("------------------------Set to first------------------------------")
 	file.Set(1, "@A4.-1")
 	file.Set(2, "@A4.-1")
 	file.Set(3, "@A4.-1")
-	strSet2 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[1,2,3]}`
+	strSet2 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[3,2,1]}`
 	check(t, "file:%s", file, strSet2)
 	check(t, "jsonB1:%s", jsonB1, strSet2)
-	dlog.Info("------------------------remove------------------------------")
+	dlog.Info("------------------------remove first------------------------------")
 	file.Remove("@A4.-1")
-	strRemove1 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[1,2]}`
+	strRemove1 := `{"A1":{"A":"a1"},"A2":[{"x":{"d":12.3}}],"A4":[2,1]}`
 	check(t, "file:%s", file, strRemove1)
 	check(t, "jsonB1:%s", jsonB1, strRemove1)
 	file.Remove("@A4")
@@ -284,21 +286,6 @@ func TestMars(t *testing.T) {
 	dlog.Info(jsonGo)
 }
 
-func TestJsonArray9(t *testing.T) {
-	jsonGo, _ := djson.NewJsonArray()
-	jsonGo.Set("xxValue", -1)
-	jsonGo.Set("xxValue2", -1)
-	jsonGo.Set("xxValue3", -1)
-
-	dlog.Info(jsonGo)
-	marshal, _ := json.Marshal(jsonGo)
-	dlog.Info(string(marshal))
-	dlog.Info(jsonGo)
-	json.Unmarshal(marshal, jsonGo)
-	dlog.Info(jsonGo)
-	jsonGo.Set("xxValue22", "@xx.xx")
-	dlog.Info(jsonGo.ToStr())
-}
 func TestJson9(t *testing.T) {
 	jsonGo, _ := djson.NewJsonFile("", make([]string, 0))
 	jsonGo.Set("xxValue", "@1")

@@ -150,8 +150,9 @@ func NewJsonMap() *JsonGo {
 	jsonGo, _ := NewJsonGo(make(map[string]interface{}))
 	return jsonGo
 }
-func NewJsonArray() (_r *JsonGo, _e error) {
-	return NewJsonGo(make([]interface{}, 0))
+func NewJsonArray() *JsonGo {
+	jsonGo, _ := NewJsonGo(make([]interface{}, 0))
+	return jsonGo
 }
 func NewJsonGo(data interface{}) (_r *JsonGo, _e error) {
 	if data == nil {

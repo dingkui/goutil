@@ -6,36 +6,47 @@ import (
 	"gitee.com/dk83/goutils/errs"
 )
 
-func (j *JsonGo) getItem(key interface{}) (*JsonGo, error) {
+func (j *JsonGo) getItem(key interface{}) (*JsonGo, bool, error) {
 	err := checkKeys(key)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	switch key.(type) {
 	case string:
 		data, err := j.mapData()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		item, ok := data[key.(string)]
 		if !ok {
-			return nil, errKey.New("get [%s] from:%#q", key, data)
+			return nil, false, errKey.New("get [%s] from:%#q", key, data)
 		}
-		return item, nil
+		return item, true, nil
 	case int:
 		data, err := j.arrayData()
 		if err != nil {
-			return nil, err
+			return nil, false, err
 		}
 		i := key.(int)
 		l := len(*data)
-		if i < 0 || i >= l {
-			//超出下标返回最后一个元素
-			return nil, errKey.New("index is out of range :%d ,from %#q", i, data)
+		if l == 0 {
+			return nil, false, errKey.New("getItem fail:[%T],target length is 0", j)
 		}
-		return (*data)[i], nil
+		if i >= 0 && i < l {
+			//取得正确下标
+			return (*data)[i], true, nil
+		} else if i == -1 {
+			//-1表示第一个
+			return (*data)[0], false, nil
+		} else if i == -2 || i == l {
+			//-2表示最后一个
+			return (*data)[l-1], false, nil
+		} else {
+			//错误下标
+			return nil, false, errKey.New("index is out of range :%d ,from %#q", i, data)
+		}
 	}
-	return nil, errs.ErrSystem.New("getItem fail:[%T] %v %v", j, key, key)
+	return nil, false, errs.ErrSystem.New("getItem fail:[%T] %v", j, key)
 }
 
 func (j *JsonGo) Get(keys ...interface{}) (*JsonGo, error) {
@@ -50,7 +61,7 @@ func (j *JsonGo) Get(keys ...interface{}) (*JsonGo, error) {
 
 	item := j
 	for _, key := range keys {
-		item, err = item.getItem(key)
+		item, _, err = item.getItem(key)
 		if err != nil {
 			return nil, err
 		}
@@ -77,15 +88,18 @@ func (j *JsonGo) setValue(key interface{}, val interface{}) (*JsonGo, error) {
 		//下标超出则在数组中追加元素
 		l := len(*data)
 
-		if i < -1 || i > l {
-			str, _ := j.Str("")
-			return nil, errTarget.New("setValue fail:%s[%d] is invalid.index value in(-1,%d) means append item,otherwise replace the item", str, i, l)
-		}
-		if i == -1 || i == l {
+		if i >= 0 && i < l {
+			(*data)[i] = v //数组下标有效进行替换
+		} else if i == -1 {
+			//-1表示加到最前
+			j.v = append([]*JsonGo{v}, *data...)
+		} else if i == -2 || i == l {
+			//-2表示加到最后
 			j.v = append(*data, v)
-			return v, nil
+		} else {
+			//错误下标
+			return nil, errTarget.New("setValue fail:%s, invalid index:[%d] -1 means prepend item, -2 means append item,otherwise replace the item", j.StrN(""), i, l)
 		}
-		(*data)[i] = v
 		return v, nil
 	case string:
 		data, err := j.mapData()
@@ -108,18 +122,34 @@ func (j *JsonGo) removeValue(key interface{}) error {
 		}
 		_data := *data
 		i := key.(int)
-		//下标超出则在数组中追加元素
 		l := len(_data)
 
-		if i < -1 || i > l-1 || l == 0 {
-			str, _ := j.Str("")
-			return errTarget.New("removeValue fail:%s[%d] is invalid.index value in(-1) means remove last item", str, i, l)
+		//if i < -1 || i > l-1 || l == 0 {
+		//	str, _ := j.Str("")
+		//	return errTarget.New("removeValue fail:%s[%d] is invalid.index value in(-1) means remove last item", str, i, l)
+		//}
+		//if i == -1 {
+		//	j.v = _data[:l-1]
+		//	return nil
+		//}
+
+		if l == 0 {
+			return errTarget.New("removeValue fail:%s,target length is 0!", j.StrN(""))
 		}
-		if i == -1 {
+		if i >= 0 && i < l {
+			//有效下标
+			j.v = append(_data[:i], _data[i+1:]...)
+		} else if i == -1 {
+			//-1,删除第一个
+			j.v = _data[1:]
+			return nil
+		} else if i == -2 || i == l {
+			//-2,删除最后一个
 			j.v = _data[:l-1]
 			return nil
+		} else {
+			return errTarget.New("removeValue fail:%s[%d] is invalid index,-1 means remove first,-2 means remove last", j.StrN(""), i)
 		}
-		j.v = append(_data[:i], _data[i+1:]...)
 		return nil
 	case string:
 		data, err := j.mapData()
@@ -168,22 +198,20 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 	item := j
 
 	for indx, key := range keys {
-		_item, err := item.getItem(key)
-		if err != nil {
+		_item, find, err := item.getItem(key)
+		if !find || (err != nil && errKey.Is(err)) {
+			addVas := val
 			//遇到不存在的key,创建对象
-			if errKey.Is(err) {
-				addVas := val
-				//遇到不存在的key,创建对象
-				if indx < len(keys)-1 {
-					addVas = getAddVal(keys[indx+1])
-				}
-				_item, err = item.setValue(key, addVas)
-				if err != nil {
-					return err
-				}
-			} else {
+			if indx < len(keys)-1 {
+				addVas = getAddVal(keys[indx+1])
+			}
+			_item, err = item.setValue(key, addVas)
+			if err != nil {
 				return err
 			}
+		}
+		if err != nil {
+			return err
 		}
 		item = _item
 	}
