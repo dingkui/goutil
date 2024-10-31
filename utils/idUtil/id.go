@@ -2,6 +2,7 @@ package idUtil
 
 import (
 	"crypto/rand"
+	"gitee.com/dk83/goutils/utils/dateUtil"
 )
 
 const dict = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"
@@ -13,6 +14,8 @@ var (
 	Rand16 = &randIdMaker{16, dict} //16进制随机数
 	Rand10 = &randIdMaker{10, dict} //10进制随机数
 	Rand8  = &randIdMaker{8, dict}  //8进制随机数
+
+	dateSTR = dateUtil.Layout("20060102150405000")
 )
 
 type randIdMaker struct {
@@ -20,6 +23,7 @@ type randIdMaker struct {
 	dict     string
 }
 
+// New 创建随机码字典，最长有效长度64
 func New(dict string) *randIdMaker {
 	return &randIdMaker{len(dict), dict}
 }
@@ -38,6 +42,17 @@ func ID16(size int) string {
 func NUM(size int) string {
 	return Rand10.Rand(size)
 }
+
+// RandWithTime 生成时间前缀的随机码，最短为24位
+func (t *randIdMaker) RandWithTime(size int) string {
+	timePrefix := dateSTR.FormatNow()
+	if size < 24 {
+		size = 24
+	}
+	return timePrefix + t.Rand(size-len(timePrefix))
+}
+
+// Rand 删除指定长度的随机码
 func (t *randIdMaker) Rand(size int) string {
 	result := make([]byte, size)
 	dictLen := byte(t.dictSize)

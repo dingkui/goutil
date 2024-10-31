@@ -15,6 +15,7 @@ var (
 	Day       dateLayout = "20060102"
 )
 
+// Layout 创建自定义layout "2006/01/02 15:04:05.000"
 func Layout(layout string) dateLayout {
 	return dateLayout(layout)
 }
