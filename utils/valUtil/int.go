@@ -68,7 +68,7 @@ func Int(val interface{}, def ...int) (int, error) {
 func IntN(val interface{}, def ...int) int {
 	re, err := Int(val, def...)
 	if err != nil {
-		dlog.ErrorCaller(err)
+		dlog.Warn(err)
 	}
 	return re
 }

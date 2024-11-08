@@ -68,7 +68,7 @@ func Int64(val interface{}, def ...int64) (int64, error) {
 func Int64N(val interface{}, def ...int64) int64 {
 	re, err := Int64(val, def...)
 	if err != nil {
-		dlog.ErrorCaller(err)
+		dlog.Warn(err)
 	}
 	return re
 }

@@ -1,4 +1,4 @@
 module gitee.com/dk83/goutils
-go 1.17
+go 1.15
 require (
 )

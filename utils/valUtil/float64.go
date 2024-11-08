@@ -61,7 +61,7 @@ func Float64(val interface{}, def ...float64) (float64, error) {
 func Float64N(val interface{}, def ...float64) float64 {
 	re, err := Float64(val, def...)
 	if err != nil {
-		dlog.ErrorCaller(err)
+		dlog.Warn(err)
 	}
 	return re
 }

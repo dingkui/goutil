@@ -39,7 +39,7 @@ func Str(val interface{}, def ...string) (string, error) {
 func StrN(val interface{}, def ...string) string {
 	re, err := Str(val, def...)
 	if err != nil {
-		dlog.ErrorCaller(err)
+		dlog.Warn(err)
 	}
 	return re
 }

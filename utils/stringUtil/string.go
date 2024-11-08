@@ -1,6 +1,8 @@
 package stringUtil
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"strings"
 )
@@ -15,7 +17,14 @@ func Fmt(s interface{}, v ...interface{}) string {
 	}
 	return fmt.Sprintf(message, v...)
 }
-
+func FormatJson(input []byte, format bool) []byte {
+	if !format {
+		return input
+	}
+	var out bytes.Buffer
+	json.Indent(&out, input, "", "  ")
+	return out.Bytes()
+}
 func InStringArray(list []string, find string) bool {
 	if list == nil || len(list) == 0 {
 		return false

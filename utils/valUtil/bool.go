@@ -59,7 +59,7 @@ func Bool(val interface{}, def ...bool) (bool, error) {
 func BoolN(val interface{}, def ...bool) bool {
 	re, err := Bool(val, def...)
 	if err != nil {
-		dlog.ErrorCaller(err)
+		dlog.Warn(err)
 	}
 	return re
 }

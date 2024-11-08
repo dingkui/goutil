@@ -35,7 +35,7 @@ func Bytes(val interface{}, def ...[]byte) ([]byte, error) {
 func BytesN(val interface{}, def ...[]byte) []byte {
 	re, err := Bytes(val, def...)
 	if err != nil {
-		dlog.ErrorCaller(err)
+		dlog.Warn(err)
 	}
 	return re
 }

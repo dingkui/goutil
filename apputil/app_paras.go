@@ -56,32 +56,6 @@ func GetParaInt64(name string, def int64) int64 {
 	return def
 }
 
-//	"github.com/go-eden/routine"
-//func GetLocal(name string) string {
-//	storage := routine.NewLocalStorage()
-//	get,ok := storage.Get().(map[string]string)
-//	if !ok {
-//		storage.Set(map[string]string{})
-//		return ""
-//	}
-//	s,has:= get[name]
-//	if has {
-//		return s
-//	}
-//	return ""
-//}
-//
-//func SetLocal(name string,value string) {
-//	storage := routine.NewLocalStorage()
-//	get,ok := storage.Get().(map[string]string)
-//	if !ok {
-//		storage.Set(map[string]string{
-//			name:value,
-//		})
-//	}
-//	get[name]=value
-//}
-
 func GetParaf(name string, def func() string) string {
 	v, has := paras[name]
 	if has {
