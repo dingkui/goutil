@@ -14,13 +14,21 @@ type JsonGo struct {
 }
 
 func (j *JsonGo) IsMap() bool {
-	return j != nil && j._type != jsonMap
+	return j != nil && j._type == jsonMap
+}
+func (j *JsonGo) Contains(key string) bool {
+	if j.IsMap() {
+		m := j.v.(map[string]*JsonGo)
+		_, ok := m[key]
+		return ok
+	}
+	return false
 }
 func (j *JsonGo) IsArray() bool {
-	return j != nil || j._type != jsonArray
+	return j != nil || j._type == jsonArray
 }
 func (j *JsonGo) mapData() (map[string]*JsonGo, error) {
-	if j._type == jsonMap {
+	if j.IsMap() {
 		m, ok := j.v.(map[string]*JsonGo)
 		if ok {
 			return m, nil
@@ -29,7 +37,7 @@ func (j *JsonGo) mapData() (map[string]*JsonGo, error) {
 	return nil, errJsonType.New("target is not a Map")
 }
 func (j *JsonGo) arrayData() (*[]*JsonGo, error) {
-	if j._type == jsonArray {
+	if j.IsArray() {
 		m, ok := j.v.([]*JsonGo)
 		if ok {
 			return &m, nil
