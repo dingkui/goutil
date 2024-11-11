@@ -8,6 +8,7 @@ import (
 	"gitee.com/dk83/goutils/dlog"
 	"gitee.com/dk83/goutils/encry"
 	"gitee.com/dk83/goutils/errs"
+	"gitee.com/dk83/goutils/utils/confUtil"
 	"gitee.com/dk83/goutils/utils/dateUtil"
 	"gitee.com/dk83/goutils/utils/fileUtil"
 	"gitee.com/dk83/goutils/utils/idUtil"
@@ -146,4 +147,7 @@ func TestAll(t *testing.T) {
 	dlog.Info(runtimeUtil.GetCaller(1))
 	dlog.Info(stringUtil.Fmt("%d", 1))
 	dlog.Info(valUtil.Str(1))
+	data := map[string]interface{}{"a": 2}
+	dlog.Info(confUtil.NewConf("d:/xx/xx2.json", &data,true))
+	dlog.Info(data)
 }

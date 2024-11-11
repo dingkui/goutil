@@ -4,6 +4,7 @@ import (
 	"gitee.com/dk83/goutils/dlog"
 	"gitee.com/dk83/goutils/errs"
 	"gitee.com/dk83/goutils/utils/fileUtil"
+	"gitee.com/dk83/goutils/utils/stringUtil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -65,7 +66,7 @@ func (j *JsonFile) save(format bool) bool {
 		return false
 	}
 	os.MkdirAll(filepath.Dir(j._file), os.ModePerm)
-	fileUtil.WriteAndSyncFile(j._file, formatJson(bytes, format), os.ModePerm)
+	fileUtil.WriteAndSyncFile(j._file, stringUtil.FormatJson(bytes, format), os.ModePerm)
 	return true
 }
 func (j *JsonFile) SaveFormat() bool {
