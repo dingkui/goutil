@@ -2,7 +2,7 @@ package valUtil
 
 import (
 	"encoding/json"
-	"gitee.com/dk83/goutils/dlog"
+	"github.com/dingkui/goutil/dlog"
 )
 
 type interfaceBytes interface{ ToBytes() ([]byte, error) }

@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"gitee.com/dk83/goutils/errs"
+	"github.com/dingkui/goutil/errs"
 	"io"
 	"time"
 )

@@ -2,9 +2,9 @@ package dlog
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/utils/dateUtil"
-	"gitee.com/dk83/goutils/utils/runtimeUtil"
-	"gitee.com/dk83/goutils/utils/stringUtil"
+	"github.com/dingkui/goutil/utils/dateUtil"
+	"github.com/dingkui/goutil/utils/runtimeUtil"
+	"github.com/dingkui/goutil/utils/stringUtil"
 	"runtime/debug"
 	"strings"
 )

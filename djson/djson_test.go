@@ -3,9 +3,9 @@ package djson_test
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/dk83/goutils/djson"
-	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/utils/valUtil"
+	"github.com/dingkui/goutil/djson"
+	"github.com/dingkui/goutil/dlog"
+	"github.com/dingkui/goutil/utils/valUtil"
 	"reflect"
 	"testing"
 )

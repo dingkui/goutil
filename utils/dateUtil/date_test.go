@@ -2,8 +2,8 @@ package dateUtil_test
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/utils/dateUtil"
+	"github.com/dingkui/goutil/dlog"
+	"github.com/dingkui/goutil/utils/dateUtil"
 	"testing"
 	"time"
 )

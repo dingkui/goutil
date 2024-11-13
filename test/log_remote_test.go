@@ -3,7 +3,7 @@ package test
 import (
 	"bytes"
 	"encoding/json"
-	"gitee.com/dk83/goutils/dlog"
+	"github.com/dingkui/goutil/dlog"
 	"io/ioutil"
 	"net/http"
 )

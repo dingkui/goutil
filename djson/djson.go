@@ -1,19 +1,5 @@
 package djson
 
-import (
-	"bytes"
-	"encoding/json"
-)
-
-func formatJson(input []byte, format bool) []byte {
-	if !format {
-		return input
-	}
-	var out bytes.Buffer
-	json.Indent(&out, input, "", "  ")
-	return out.Bytes()
-}
-
 func CopyMapVal(target map[string]interface{}, source map[string]interface{}, keys ...string) {
 	for _, key := range keys {
 		value, has := source[key]

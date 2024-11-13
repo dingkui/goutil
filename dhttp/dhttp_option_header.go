@@ -2,7 +2,7 @@ package dhttp
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/djson"
+	"github.com/dingkui/goutil/djson"
 	"net/http"
 	"strconv"
 	"strings"

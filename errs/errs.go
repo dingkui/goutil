@@ -2,8 +2,8 @@ package errs
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/utils/runtimeUtil"
-	"gitee.com/dk83/goutils/utils/stringUtil"
+	"github.com/dingkui/goutil/utils/runtimeUtil"
+	"github.com/dingkui/goutil/utils/stringUtil"
 )
 
 //## 错误类型

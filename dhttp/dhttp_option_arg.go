@@ -2,7 +2,7 @@ package dhttp
 
 import (
 	"bytes"
-	"gitee.com/dk83/goutils/djson"
+	"github.com/dingkui/goutil/djson"
 	"io"
 	"mime/multipart"
 	"net/http"

@@ -1,7 +1,7 @@
 package dhttp
 
 import (
-	"gitee.com/dk83/goutils/djson"
+	"github.com/dingkui/goutil/djson"
 	"io"
 )
 

@@ -2,8 +2,8 @@
 package djson_test
 
 import (
-	"gitee.com/dk83/goutils/djson"
-	"gitee.com/dk83/goutils/dlog"
+	"github.com/dingkui/goutil/djson"
+	"github.com/dingkui/goutil/dlog"
 	"testing"
 )
 

@@ -1,8 +1,8 @@
 package djson
 
 import (
-	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/utils/valUtil"
+	"github.com/dingkui/goutil/dlog"
+	"github.com/dingkui/goutil/utils/valUtil"
 )
 
 // Native 获取原生数据

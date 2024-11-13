@@ -1,7 +1,7 @@
 package djson
 
 import (
-	"gitee.com/dk83/goutils/errs"
+	"github.com/dingkui/goutil/errs"
 	"strconv"
 	"strings"
 )

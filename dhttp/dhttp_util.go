@@ -3,7 +3,7 @@ package dhttp
 import (
 	"bytes"
 	"fmt"
-	"gitee.com/dk83/goutils/utils/valUtil"
+	"github.com/dingkui/goutil/utils/valUtil"
 	"io"
 	"io/ioutil"
 	"net/http"

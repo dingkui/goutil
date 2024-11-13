@@ -2,7 +2,7 @@ package idUtil
 
 import (
 	"crypto/rand"
-	"gitee.com/dk83/goutils/utils/dateUtil"
+	"github.com/dingkui/goutil/utils/dateUtil"
 )
 
 const dict = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_"

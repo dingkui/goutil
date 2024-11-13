@@ -2,8 +2,8 @@ package dhttp
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/djson"
-	"gitee.com/dk83/goutils/errs"
+	"github.com/dingkui/goutil/djson"
+	"github.com/dingkui/goutil/errs"
 	"io"
 	"io/ioutil"
 	"net/url"

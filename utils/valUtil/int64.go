@@ -1,7 +1,7 @@
 package valUtil
 
 import (
-	"gitee.com/dk83/goutils/dlog"
+	"github.com/dingkui/goutil/dlog"
 	"strconv"
 )
 

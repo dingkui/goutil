@@ -1,10 +1,10 @@
 package djson
 
 import (
-	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/errs"
-	"gitee.com/dk83/goutils/utils/fileUtil"
-	"gitee.com/dk83/goutils/utils/stringUtil"
+	"github.com/dingkui/goutil/dlog"
+	"github.com/dingkui/goutil/errs"
+	"github.com/dingkui/goutil/utils/fileUtil"
+	"github.com/dingkui/goutil/utils/stringUtil"
 	"io/ioutil"
 	"os"
 	"path/filepath"

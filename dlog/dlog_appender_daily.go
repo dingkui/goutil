@@ -2,7 +2,7 @@ package dlog
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/utils/dateUtil"
+	"github.com/dingkui/goutil/utils/dateUtil"
 	"os"
 	"path/filepath"
 	"time"

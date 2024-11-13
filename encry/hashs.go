@@ -9,7 +9,7 @@ import (
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
-	"gitee.com/dk83/goutils/dlog"
+	"github.com/dingkui/goutil/dlog"
 	"hash"
 	"io"
 	"os"

@@ -2,8 +2,8 @@ package djson
 
 import (
 	"encoding/json"
-	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/errs"
+	"github.com/dingkui/goutil/dlog"
+	"github.com/dingkui/goutil/errs"
 	"reflect"
 	"strings"
 )

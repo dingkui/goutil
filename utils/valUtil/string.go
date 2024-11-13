@@ -3,7 +3,7 @@ package valUtil
 import (
 	"encoding/json"
 	"fmt"
-	"gitee.com/dk83/goutils/dlog"
+	"github.com/dingkui/goutil/dlog"
 )
 
 type interfaceStr interface{ ToStr() (string, error) }

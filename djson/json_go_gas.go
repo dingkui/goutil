@@ -3,7 +3,7 @@ package djson
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/errs"
+	"github.com/dingkui/goutil/errs"
 )
 
 func (j *JsonGo) getItem(key interface{}) (*JsonGo, bool, error) {

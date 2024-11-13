@@ -2,8 +2,8 @@ package dlog_test
 
 import (
 	"fmt"
-	"gitee.com/dk83/goutils/dlog"
-	"gitee.com/dk83/goutils/utils/runtimeUtil"
+	"github.com/dingkui/goutil/dlog"
+	"github.com/dingkui/goutil/utils/runtimeUtil"
 	"testing"
 	"time"
 )

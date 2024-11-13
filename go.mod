@@ -1,4 +1,4 @@
-module gitee.com/dk83/goutils
+module github.com/dingkui/goutil
 go 1.15
 require (
 )

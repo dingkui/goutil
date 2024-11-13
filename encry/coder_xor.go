@@ -2,7 +2,7 @@ package encry
 
 import (
 	"bufio"
-	"gitee.com/dk83/goutils/errs"
+	"github.com/dingkui/goutil/errs"
 	"io"
 )
 

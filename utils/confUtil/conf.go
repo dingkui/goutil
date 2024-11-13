@@ -2,10 +2,10 @@ package confUtil
 
 import (
 	"encoding/json"
-	"gitee.com/dk83/goutils/errs"
-	"gitee.com/dk83/goutils/utils/fileUtil"
-	"gitee.com/dk83/goutils/utils/stringUtil"
-	"gitee.com/dk83/goutils/utils/valUtil"
+	"github.com/dingkui/goutil/errs"
+	"github.com/dingkui/goutil/utils/fileUtil"
+	"github.com/dingkui/goutil/utils/stringUtil"
+	"github.com/dingkui/goutil/utils/valUtil"
 	"io/ioutil"
 	"os"
 	"path/filepath"
