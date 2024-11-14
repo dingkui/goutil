@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/dingkui/goutil/dlog"
 	"github.com/dingkui/goutil/errs"
+	"github.com/dingkui/goutil/utils/valUtil/force"
 	"reflect"
 	"strings"
 )
@@ -34,7 +35,7 @@ func (j *JsonGo) mapData() (map[string]*JsonGo, error) {
 			return m, nil
 		}
 	}
-	return nil, errJsonType.New("target is not a Map")
+	return nil, errJsonType.New("target is not a Map:%s", force.Str(j))
 }
 func (j *JsonGo) arrayData() (*[]*JsonGo, error) {
 	if j.IsArray() {
@@ -43,7 +44,7 @@ func (j *JsonGo) arrayData() (*[]*JsonGo, error) {
 			return &m, nil
 		}
 	}
-	return nil, errJsonType.New("target is not a Array")
+	return nil, errJsonType.New("target is not a Array:%s", force.Str(j))
 }
 func (j *JsonGo) ReNew(val interface{}) error {
 	f, ok := val.(JsonGo)

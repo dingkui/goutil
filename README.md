@@ -35,6 +35,16 @@
 - 自定义错误类型
 - 支持错误类型判断
 - 支持错误链的打印
+- 支持追踪错误发生地
+```sh
+2024/11/14 18:41:04.327 WARN djson_test.go:144: json_go_gas.go:47 [9003:ErrerrKey] index is out of range:9,from [12.3,666]
+2024/11/14 18:41:04.327 TEST djson_test.go:144: OK: jsonB1:failDef
+2024/11/14 18:41:04.327 WARN djson_test.go:145: int.go:51 [2004:ErrErrTargetType] string to int err.strconv.Atoi: parsing "xxx": invalid syntax
+2024/11/14 18:41:04.327 TEST djson_test.go:145: OK: jsonB1:9
+2024/11/14 18:41:04.327 WARN djson_test.go:146: json_go.go:38 [9001:ErrerrJsonType] target is not a Map:[12.3,666]
+2024/11/14 18:41:04.327 TEST djson_test.go:146: OK: jsonB1.StrN("@A2.3.x.d"):failDef
+```
+
 ## djson
 - json解析：支持结构体，map, array,json格式字符串
 - 多级取值很简单，一个@搞定

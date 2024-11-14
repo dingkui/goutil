@@ -1,22 +1,8 @@
-package test
+package base_test
 
 import (
 	"fmt"
-	"github.com/dingkui/goutil/dhttp"
-	"github.com/dingkui/goutil/djson"
 	"github.com/dingkui/goutil/dlog"
-	"github.com/dingkui/goutil/encry"
-	"github.com/dingkui/goutil/errs"
-	"github.com/dingkui/goutil/utils/apputil"
-	"github.com/dingkui/goutil/utils/confUtil"
-	"github.com/dingkui/goutil/utils/dateUtil"
-	"github.com/dingkui/goutil/utils/fileUtil"
-	"github.com/dingkui/goutil/utils/idUtil"
-	"github.com/dingkui/goutil/utils/mathUtil"
-	"github.com/dingkui/goutil/utils/runtimeUtil"
-	"github.com/dingkui/goutil/utils/stringUtil"
-	"github.com/dingkui/goutil/utils/valUtil"
-	"github.com/dingkui/goutil/utils/valUtil/forceVal"
 	"reflect"
 	"testing"
 )
@@ -106,52 +92,4 @@ func TestArray(t *testing.T) {
 	s := []int{1}
 	ints := s[:0]
 	dlog.Info(ints)
-}
-
-var (
-	errUnReached  = errs.Err(19001, "xx") //不应该到达的错误
-	errValid      = errs.Err(19002, "xx") //校验错误
-	errJsonType   = errs.Err(19003, "xx") //json数据类型错误
-	errTarget     = errs.Err(19004, "xx") //目标错误
-	errTargetType = errs.Err(19005, "xx") //目标类型错误
-)
-
-func TestErr(t *testing.T) {
-	defer dlog.Recover()
-	//errs.Err(9001, "xx232")    //不应该到达的错误
-
-	err1 := errUnReached.New("errUnReached")
-	err2 := errs.ErrSystem.New(err1, "ErrSystem")
-
-	dlog.Info(errUnReached.Is(err1))
-	dlog.Info(errUnReached.Is(err2))
-	dlog.Info(errUnReached.Msg(err1))
-	dlog.Info(errUnReached.Msg(err2))
-	dlog.Info(errs.ErrSystem.Is(err1))
-	dlog.Info(errs.ErrSystem.Is(err2))
-	dlog.Info(errs.ErrSystem.Msg(err1))
-	dlog.Info(errs.ErrSystem.Msg(err2))
-	dlog.Info(err1)
-	dlog.Info(err2)
-}
-
-func TestAll(t *testing.T) {
-	dlog.Info(apputil.Para("xx", "1"))
-	dlog.Info(dhttp.Client{})
-	dlog.Info(djson.NewJsonMap())
-	dlog.Info(encry.Md5)
-	dlog.Info(errs.ErrSystem.New("ErrSystem"))
-	dlog.Info(dateUtil.DateTime.FormatNow())
-	dlog.Info(fileUtil.Exists("d:/"))
-	dlog.Info(idUtil.ID16(32))
-	dlog.Info(mathUtil.Round(12.1, 3))
-	dlog.Info(runtimeUtil.GetCaller(1))
-	dlog.Info(stringUtil.Fmt("%d", 1))
-	dlog.Info(valUtil.Str(1))
-	dlog.Info(valUtil.Int64("",999))
-	data := map[string]interface{}{"a": 2}
-	dlog.Info(confUtil.NewConf("d:/xx/xx2.json", &data,true))
-	dlog.Info(data)
-	dlog.Info(forceVal.Int64("64"))
-	dlog.Info(string([]byte{0xc6, 0x89, 0xb7, 0xba, 0xcc}))
 }

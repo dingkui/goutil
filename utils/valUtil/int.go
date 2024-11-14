@@ -1,19 +1,19 @@
 package valUtil
 
 import (
+	"github.com/dingkui/goutil/consts"
+	"github.com/dingkui/goutil/errs"
 	"strconv"
 )
 
-type interfaceInt interface{ ToInt() (int, error) }
-
 func ToInt(data interface{}) (int, error) {
 	if data == nil {
-		return Emputy_int, errTargetType.New("value is nil")
+		return consts.EmptyInt, errs.ErrTargetType.New("value is nil")
 	}
 	switch t := data.(type) {
 	case int:
 		return t, nil
-	case interfaceInt:
+	case consts.IfToInt:
 		return t.ToInt()
 	case int64:
 		return int(t), nil
@@ -38,21 +38,21 @@ func ToInt(data interface{}) (int, error) {
 		if float64(v) == t {
 			return v, nil
 		}
-		return Emputy_int, errTargetType.New("float64 to int,losing precision:%v -> %v", data, v)
+		return consts.EmptyInt, errs.ErrTargetType.New("float64 to int,losing precision:%v -> %v", data, v)
 	case float32:
 		v := int(t)
 		if float32(v) == t {
 			return v, nil
 		}
-		return Emputy_int, errTargetType.New("float32 to int,losing precision:%v -> %v", data, v)
+		return consts.EmptyInt, errs.ErrTargetType.New("float32 to int,losing precision:%v -> %v", data, v)
 	case string:
 		num, err := strconv.Atoi(t)
 		if err != nil {
-			return Emputy_int, err
+			return consts.EmptyInt, errs.ErrTargetType.New("string to int err.",err)
 		}
 		return num, nil
 	}
-	return Emputy_int, errTargetType.New("value is not Int")
+	return consts.EmptyInt, errs.ErrTargetType.New("value is not Int")
 }
 func Int(val interface{}, def ...int) (int, error) {
 	re, err := ToInt(val)
@@ -60,7 +60,7 @@ func Int(val interface{}, def ...int) (int, error) {
 		if len(def) > 0 {
 			return def[0], err
 		}
-		return Emputy_int, err
+		return consts.EmptyInt, err
 	}
 	return re, err
 }

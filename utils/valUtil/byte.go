@@ -2,18 +2,18 @@ package valUtil
 
 import (
 	"encoding/json"
+	"github.com/dingkui/goutil/consts"
+	"github.com/dingkui/goutil/errs"
 )
-
-type interfaceBytes interface{ ToBytes() ([]byte, error) }
 
 func ToBytes(data interface{}) ([]byte, error) {
 	if data == nil {
-		return nil, errTargetType.New("value is nil")
+		return nil, errs.ErrTargetType.New("value is nil")
 	}
 	switch t := data.(type) {
 	case []byte:
 		return t, nil
-	case interfaceBytes:
+	case consts.IfToBytes:
 		return t.ToBytes()
 	case string:
 		return []byte(t), nil

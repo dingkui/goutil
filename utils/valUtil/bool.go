@@ -1,19 +1,19 @@
 package valUtil
 
 import (
+	"github.com/dingkui/goutil/consts"
+	"github.com/dingkui/goutil/errs"
 	"strings"
 )
 
-type interfaceBool interface{ ToBool() (bool, error) }
-
 func ToBool(data interface{}) (bool, error) {
 	if data == nil {
-		return Emputy_bool, errTargetType.New("value is nil")
+		return consts.EmptyBool, errs.ErrTargetType.New("value is nil")
 	}
 	switch t := data.(type) {
 	case bool:
 		return t, nil
-	case interfaceBool:
+	case consts.IfToBool:
 		return t.ToBool()
 	case string:
 		str := strings.ToLower(t)
@@ -43,7 +43,7 @@ func ToBool(data interface{}) (bool, error) {
 	case float32:
 		return t != 0, nil
 	}
-	return Emputy_bool, errTargetType.New("value is not Bool")
+	return consts.EmptyBool, errs.ErrTargetType.New("value is not Bool")
 }
 func Bool(val interface{}, def ...bool) (bool, error) {
 	re, err := ToBool(val)
@@ -51,7 +51,7 @@ func Bool(val interface{}, def ...bool) (bool, error) {
 		if len(def) > 0 {
 			return def[0], err
 		}
-		return Emputy_bool, err
+		return consts.EmptyBool, err
 	}
 	return re, err
 }

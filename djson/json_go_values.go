@@ -1,6 +1,7 @@
 package djson
 
 import (
+	"github.com/dingkui/goutil/consts"
 	"github.com/dingkui/goutil/dlog"
 	"github.com/dingkui/goutil/utils/valUtil"
 )
@@ -111,7 +112,7 @@ func (j *JsonGo) Str(def string, keys ...interface{}) (string, error) {
 func (j *JsonGo) StrN(def string, keys ...interface{}) string {
 	t, err := j.Str(def, keys...)
 	if err != nil {
-		dlog.Warn(err)
+		dlog.WARN.LogCaller(0,err)
 	}
 	return t
 }
@@ -129,7 +130,7 @@ func (j *JsonGo) Int64(def int64, keys ...interface{}) (int64, error) {
 func (j *JsonGo) Int64N(def int64, keys ...interface{}) int64 {
 	t, err := j.Int64(def, keys...)
 	if err != nil {
-		dlog.Warn(err)
+		dlog.WARN.LogCaller(0,err)
 	}
 	return t
 }
@@ -143,7 +144,7 @@ func (j *JsonGo) Int(def int, keys ...interface{}) (int, error) {
 func (j *JsonGo) IntN(def int, keys ...interface{}) int {
 	t, err := j.Int(def, keys...)
 	if err != nil {
-		dlog.Warn(err)
+		dlog.WARN.LogCaller(0,err)
 	}
 	return t
 }
@@ -157,7 +158,7 @@ func (j *JsonGo) Float64(def float64, keys ...interface{}) (float64, error) {
 func (j *JsonGo) Float64N(def float64, keys ...interface{}) float64 {
 	t, err := j.Float64(def, keys...)
 	if err != nil {
-		dlog.Warn(err)
+		dlog.WARN.LogCaller(0,err)
 	}
 	return t
 }
@@ -172,28 +173,28 @@ func (j *JsonGo) Bool(def bool, keys ...interface{}) (bool, error) {
 func (j *JsonGo) BoolN(def bool, keys ...interface{}) bool {
 	t, err := j.Bool(def, keys...)
 	if err != nil {
-		dlog.Warn(err)
+		dlog.WARN.LogCaller(0,err)
 	}
 	return t
 }
 
 func (j *JsonGo) ToStr() (string, error) {
-	return j.Str(valUtil.Emputy_str)
+	return j.Str(consts.EmptyStr)
 }
 func (j *JsonGo) ToInt64() (int64, error) {
-	return j.Int64(valUtil.Emputy_int64)
+	return j.Int64(consts.EmptyInt64)
 }
 func (j *JsonGo) ToInt() (int, error) {
-	return j.Int(valUtil.Emputy_int)
+	return j.Int(consts.EmptyInt)
 }
 func (j *JsonGo) ToBool() (bool, error) {
-	return j.Bool(valUtil.Emputy_bool)
+	return j.Bool(consts.EmptyBool)
 }
 func (j *JsonGo) ToBytes() ([]byte, error) {
 	return j.Bytes()
 }
 func (j *JsonGo) ToFloat64() (float64, error) {
-	return j.Float64(valUtil.Emputy_float64)
+	return j.Float64(consts.EmptyFloat64)
 }
 
 // UnmarshalJSON implements the json.Unmarshaler interface.

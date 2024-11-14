@@ -1,19 +1,19 @@
 package valUtil
 
 import (
+	"github.com/dingkui/goutil/consts"
+	"github.com/dingkui/goutil/errs"
 	"strconv"
 )
 
-type interfaceFloat64 interface{ ToFloat64() (float64, error) }
-
 func ToFloat64(data interface{}) (float64, error) {
 	if data == nil {
-		return Emputy_float64, errTargetType.New("value is nil")
+		return consts.EmptyFloat64, errs.ErrTargetType.New("value is nil")
 	}
 	switch t := data.(type) {
 	case float64:
 		return t, nil
-	case interfaceFloat64:
+	case consts.IfToFloat64:
 		return t.ToFloat64()
 	case float32:
 		return float64(t), nil
@@ -40,12 +40,12 @@ func ToFloat64(data interface{}) (float64, error) {
 	case string:
 		num, err := strconv.ParseFloat(t, 64)
 		if err != nil {
-			return Emputy_float64, err
+			return consts.EmptyFloat64, err
 		}
 		return num, nil
 	}
 
-	return Emputy_float64, errTargetType.New("value is not Float")
+	return consts.EmptyFloat64, errs.ErrTargetType.New("value is not Float")
 }
 func Float64(val interface{}, def ...float64) (float64, error) {
 	re, err := ToFloat64(val)
@@ -53,7 +53,7 @@ func Float64(val interface{}, def ...float64) (float64, error) {
 		if len(def) > 0 {
 			return def[0], err
 		}
-		return Emputy_float64, err
+		return consts.EmptyFloat64, err
 	}
 	return re, err
 }

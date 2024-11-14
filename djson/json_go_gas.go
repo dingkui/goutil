@@ -4,6 +4,7 @@ package djson
 import (
 	"fmt"
 	"github.com/dingkui/goutil/errs"
+	"github.com/dingkui/goutil/utils/valUtil/force"
 )
 
 func (j *JsonGo) getItem(key interface{}) (*JsonGo, bool, error) {
@@ -19,7 +20,7 @@ func (j *JsonGo) getItem(key interface{}) (*JsonGo, bool, error) {
 		}
 		item, ok := data[key.(string)]
 		if !ok {
-			return nil, false, errKey.New("get [%s] from:%#q", key, data)
+			return nil, false, errKey.New("get [%s] from:%s", key, force.Str(data))
 		}
 		return item, true, nil
 	case int:
@@ -43,7 +44,7 @@ func (j *JsonGo) getItem(key interface{}) (*JsonGo, bool, error) {
 			return (*data)[l-1], false, nil
 		} else {
 			//错误下标
-			return nil, false, errKey.New("index is out of range :%d ,from %#q", i, data)
+			return nil, false, errKey.New("index is out of range:%d,from %s", i,force.Str(data))
 		}
 	}
 	return nil, false, errs.ErrSystem.New("getItem fail:[%T] %v", j, key)
@@ -199,7 +200,7 @@ func (j *JsonGo) Set(val interface{}, keys ...interface{}) error {
 
 	for indx, key := range keys {
 		_item, find, err := item.getItem(key)
-		if !find || (err != nil && errKey.Is(err)) {
+		if !find || (err != nil && errKey.IsType(err)) {
 			addVas := val
 			//遇到不存在的key,创建对象
 			if indx < len(keys)-1 {

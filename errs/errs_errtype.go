@@ -51,12 +51,15 @@ type ErrType struct {
 }
 
 func (e *ErrType) New(msg interface{}, a ...interface{}) error {
-	return e.NewWithData(nil, msg, a...)
+	return e.new(nil, msg, a...)
 }
 func (e *ErrType) NewWithData(d interface{}, msg interface{}, a ...interface{}) error {
+	return e.new(d, msg, a...)
+}
+func (e *ErrType) new(d interface{}, msg interface{}, a ...interface{}) error {
 	err := &errInfo{
 		t: e,
-		a: runtimeUtil.GetCaller(2),
+		a: runtimeUtil.GetCaller(3),
 		d: d,
 	}
 
@@ -73,17 +76,18 @@ func (e *ErrType) NewWithData(d interface{}, msg interface{}, a ...interface{}) 
 		return &Error{trace: []*errInfo{err}}
 	}
 }
-func (e *ErrType) Is(err error) bool {
+
+
+func (e *ErrType) IsType(err error) bool {
+	_, ok := e.Is(err)
+	return ok
+}
+func (e *ErrType) Is(err error) (*errInfo, bool) {
 	_e, ok := err.(*Error)
 	if !ok {
-		return false
+		return nil, false
 	}
-	for _, i2 := range _e.trace {
-		if i2.t == e {
-			return true
-		}
-	}
-	return false
+	return _e.Is(e)
 }
 func (e *ErrType) Msg(err error) string {
 	_e, ok := err.(*Error)

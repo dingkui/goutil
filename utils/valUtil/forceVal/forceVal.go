@@ -29,7 +29,7 @@ func Float64(val interface{}, def ...float64) float64 {
 func Int(val interface{}, def ...int) int {
 	re, err := valUtil.Int(val, def...)
 	if err != nil {
-		dlog.Warn(err)
+		dlog.WARN.LogCaller(0,err)
 	}
 	return re
 }

@@ -4,12 +4,33 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/dingkui/goutil/consts"
 	"strings"
 )
+func ToStr(data interface{}) (string, error) {
+	switch t := data.(type) {
+	case string:
+		return t, nil
+	case consts.IfToStr:
+		return t.ToStr()
+	case error:
+		return t.Error(),nil
+	case int, int8, int16, int32, int64, uint, uint8, uint16, uint32, uint64, float64, float32:
+		return fmt.Sprintf("%v", t), nil
+	case []byte:
+		return string(t), nil
+	}
 
+	b, e := json.Marshal(data)
+	if e != nil {
+		return consts.EmptyStr, e
+	}
+	return string(b), nil
+}
 func Fmt(s interface{}, v ...interface{}) string {
 	if len(v) == 0 {
-		return fmt.Sprint(s)
+		str, _ := ToStr(s)
+		return str
 	}
 	message, ok := s.(string)
 	if !ok || strings.Index(message, "%") == -1 {

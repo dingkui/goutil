@@ -14,6 +14,7 @@ type logType struct {
 	name  string
 	sync  bool // 是否同步执行
 	addr  string
+	color  string
 }
 
 var (
@@ -66,6 +67,9 @@ func (t logType) log(depth int, v1 interface{}, v ...interface{}) {
 
 func (t logType) Log(v1 interface{}, v ...interface{}) {
 	t.log(1, v1, v...)
+}
+func (t logType) ConsoleColor(color string) {
+	t.color = color
 }
 func (t logType) LogCaller(caller int, v1 interface{}, v ...interface{}) {
 	t.log(1+caller, v1, v...)
