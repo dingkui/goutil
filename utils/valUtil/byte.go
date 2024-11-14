@@ -2,7 +2,6 @@ package valUtil
 
 import (
 	"encoding/json"
-	"github.com/dingkui/goutil/dlog"
 )
 
 type interfaceBytes interface{ ToBytes() ([]byte, error) }
@@ -31,11 +30,4 @@ func Bytes(val interface{}, def ...[]byte) ([]byte, error) {
 		return nil, err
 	}
 	return re, err
-}
-func BytesN(val interface{}, def ...[]byte) []byte {
-	re, err := Bytes(val, def...)
-	if err != nil {
-		dlog.Warn(err)
-	}
-	return re
 }

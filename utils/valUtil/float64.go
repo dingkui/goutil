@@ -1,7 +1,6 @@
 package valUtil
 
 import (
-	"github.com/dingkui/goutil/dlog"
 	"strconv"
 )
 
@@ -57,11 +56,4 @@ func Float64(val interface{}, def ...float64) (float64, error) {
 		return Emputy_float64, err
 	}
 	return re, err
-}
-func Float64N(val interface{}, def ...float64) float64 {
-	re, err := Float64(val, def...)
-	if err != nil {
-		dlog.Warn(err)
-	}
-	return re
 }

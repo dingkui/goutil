@@ -6,6 +6,7 @@ import (
 	"github.com/dingkui/goutil/djson"
 	"github.com/dingkui/goutil/dlog"
 	"github.com/dingkui/goutil/utils/valUtil"
+	"github.com/dingkui/goutil/utils/valUtil/forceVal"
 	"reflect"
 	"testing"
 )
@@ -84,20 +85,20 @@ func TestJsonGo2(t *testing.T) {
 	a21 := &TypeA{}
 	jsonB1.As(a21, "A1")
 	a21Str := `{"A":"a1","B":"b1"}`
-	check(t, "TypeA:%s", valUtil.StrN(a21, failDef), a21Str)
+	check(t, "TypeA:%s", forceVal.Str(a21, failDef), a21Str)
 	dlog.Info("------------------------------------------------------")
 	a3 := &TypeA2{}
 	a31 := &TypeA2{}
 	a3Str := `{"A":"a1","B":"b1","C":""}`
 	jsonB1.As(a3, "A1")
 	jsonB1.As(&a31, "A1")
-	check(t, "TypeA2:%s", valUtil.StrN(a3, failDef), a3Str)
-	check(t, "&TypeA2:%s", valUtil.StrN(a31, failDef), a3Str)
+	check(t, "TypeA2:%s", forceVal.Str(a3, failDef), a3Str)
+	check(t, "&TypeA2:%s", forceVal.Str(a31, failDef), a3Str)
 	dlog.Info("------------------------map------------------------------")
 	a4 := make(map[string]interface{})
 	a4Str := `{"A":"a1","B":"b1","b":1}`
 	jsonB1.As(&a4, "A1")
-	check(t, "map a4:%s", valUtil.StrN(a4, failDef), a4Str)
+	check(t, "map a4:%s", forceVal.Str(a4, failDef), a4Str)
 }
 
 //Get Set 测试
@@ -224,7 +225,7 @@ func TestNewJsonFile(t *testing.T) {
 //
 //}
 func TestInt2(t *testing.T) {
-	check(t, "N0:%v", valUtil.IntN(float64(21.1)), unCheck)
+	check(t, "N0:%v", forceVal.Int(float64(21.1)), unCheck)
 	//check(t, "StrEmpty:%v",  djson.StrEmpty.ToStr(), unCheck)
 	//check(t, "StrEmpty:%v",  djson.N0.IntN(0), unCheck)
 	//check(t, "BoolFalse:%v",  djson.BoolFalse.ToStr(), unCheck)

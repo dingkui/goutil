@@ -1,7 +1,6 @@
 package valUtil
 
 import (
-	"github.com/dingkui/goutil/dlog"
 	"strings"
 )
 
@@ -55,11 +54,4 @@ func Bool(val interface{}, def ...bool) (bool, error) {
 		return Emputy_bool, err
 	}
 	return re, err
-}
-func BoolN(val interface{}, def ...bool) bool {
-	re, err := Bool(val, def...)
-	if err != nil {
-		dlog.Warn(err)
-	}
-	return re
 }

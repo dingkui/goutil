@@ -3,7 +3,7 @@ package dhttp
 import (
 	"bytes"
 	"fmt"
-	"github.com/dingkui/goutil/utils/valUtil"
+	"github.com/dingkui/goutil/utils/valUtil/forceVal"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -29,7 +29,7 @@ func GetURLParams(params map[string]interface{}) string {
 		}
 		buf.WriteString(url.QueryEscape(k))
 		if params[k] != nil {
-			s := valUtil.StrN(params[k])
+			s := forceVal.Str(params[k])
 			buf.WriteString("=" + strings.Replace(url.QueryEscape(s), "+", "%20", -1))
 		}
 	}

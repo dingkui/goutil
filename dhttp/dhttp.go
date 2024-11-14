@@ -4,7 +4,7 @@ import (
 	"github.com/dingkui/goutil/djson"
 	"github.com/dingkui/goutil/dlog"
 	"github.com/dingkui/goutil/errs"
-	"github.com/dingkui/goutil/utils/valUtil"
+	"github.com/dingkui/goutil/utils/valUtil/forceVal"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -144,7 +144,7 @@ func (ops HTTPMethod) DoReq(uri *url.URL, headers map[string]string, body io.Rea
 
 	contentLength, ok := headers[HTTPHeaderContentLength]
 	if listener != nil && body != nil && ok {
-		teeData, progress := newTeeReader(body, nil, listener, valUtil.Int64N(contentLength))
+		teeData, progress := newTeeReader(body, nil, listener, forceVal.Int64(contentLength))
 		body = teeData
 		// Transfer started
 		progress.reqStarted()

@@ -3,7 +3,6 @@ package valUtil
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/dingkui/goutil/dlog"
 )
 
 type interfaceStr interface{ ToStr() (string, error) }
@@ -35,11 +34,4 @@ func Str(val interface{}, def ...string) (string, error) {
 		return Emputy_str, err
 	}
 	return re, err
-}
-func StrN(val interface{}, def ...string) string {
-	re, err := Str(val, def...)
-	if err != nil {
-		dlog.Warn(err)
-	}
-	return re
 }

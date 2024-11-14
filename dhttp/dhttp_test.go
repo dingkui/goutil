@@ -86,7 +86,7 @@ func TestClient1(t *testing.T) {
 		return
 	}
 	json, i, err := res.HandleResAsStr()
-	dlog.Info(valUtil.StrN(json), i, err)
+	dlog.Info(forceVal.Str(json), i, err)
 }
 func TestClient2(t *testing.T) {
 	jsonGo, _ := djson.NewJsonGo(make(map[string]interface{}))
@@ -94,7 +94,7 @@ func TestClient2(t *testing.T) {
 	jsonGo.Set("1234", "pass")
 	form, err := client.SendJson("POST", "/api/ma/auth", jsonGo)
 	dlog.Info(err)
-	dlog.Info(valUtil.StrN(form))
+	dlog.Info(forceVal.Str(form))
 }
 
 func TestHttp(t *testing.T) {

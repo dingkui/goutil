@@ -1,7 +1,6 @@
 package valUtil
 
 import (
-	"github.com/dingkui/goutil/dlog"
 	"strconv"
 )
 
@@ -61,14 +60,7 @@ func Int(val interface{}, def ...int) (int, error) {
 		if len(def) > 0 {
 			return def[0], err
 		}
-		return 0, err
+		return Emputy_int, err
 	}
 	return re, err
-}
-func IntN(val interface{}, def ...int) int {
-	re, err := Int(val, def...)
-	if err != nil {
-		dlog.Warn(err)
-	}
-	return re
 }
